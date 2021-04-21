@@ -1,0 +1,86 @@
+<div class="container">
+	<div class="row justify-content-center pt-1">
+			<strong>{{"create user role"|uppercase}}</strong>
+	</div>
+   <div class="row pt-3">
+       <div class="col-md">
+                <div class="container">
+					<div class="row">
+						<div class="col-md-3">
+							<i class="fas fa-user-tag pr-2"></i>
+                            <label class="required">{{"user role name"|uppercase}}</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group input-group">
+								<input type="text"  class="form-control" placeholder="unique role name" [(ngModel)]="roleName" (blur)="roleNameValidation($event,roleName)" maxlength="25">
+							</div> <!-- form-group// -->
+						</div>
+					</div>
+				</div>
+				
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="row ml-2">{{"Select core table"|uppercase}}</div>
+							<div class="container coreTable shadow">
+								<div class="row">
+									<div class="selectBox">
+											<div class="form-check" *ngFor="let item of dataArray">
+												<input class="form-check-input" type="checkbox" [(ngModel)]="item.tableSelected" (change)="getselectedCoreTableId($event,item.id)">
+												<!-- <input class="form-check-input" type="checkbox" name="{{hub.hubId}}" [value]="hub.hubId" (change)="getselectedHubId($event,hub.hubId)" >{{hub.hubName}} -->
+												<label class="form-check-label" for="flexCheckDefault">{{item.tableName|uppercase}}
+												</label>
+											</div>
+									</div> 
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="row ml-2 required">{{"Select modules"|uppercase}}</div>
+							<div class="container coreTable shadow">
+								<div class="row">
+									<div class="selectBox">
+										<div *ngFor="let hub of moduleData; let i=index">
+											
+											<div class="form-check">
+												<input class="form-check-input" type="checkbox" [(ngModel)]="hub.selectedHub" (change)="getselectedHubId($event,hub.id)" >
+												<label class="form-check-label" for="flexCheckDefault">{{hub.name|uppercase}}</label>
+									 		 </div>
+	
+											<div *ngFor="let module of moduleData[i].rrrModuleList">
+												<div class="container ml-4 mt-1">
+													<div class="row ">
+														<div class="form-check">
+															<!-- <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"> -->
+															<input class="form-check-input" type="checkbox" [(ngModel)]="module.selectedModule" (change)="getselectedModuleId($event,module.id,hub.id)" >
+															<label class="form-check-label" for="flexCheckDefault">{{module.name|uppercase}}</label>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="container">
+					<div class="row mt-3">
+						<div class="col-md-3">
+							<button type="submit" class="btn-lg text-white btn-success" (click)="userRoleCreate()" [disabled]="!isValidRoleName">
+								<i class="fas fa-forward pr-1"></i>
+								{{"submit"|uppercase}}</button>
+						</div>
+						<div class="col-mt-3">
+							<button type="button" routerLink="/userCompanyRegistration/menu" class="btn-lg btn-primary">
+							<i class="fas fa-backward pr-1"></i>
+								{{"back"|uppercase}}</button>
+						</div>
+						
+					</div>
+				</div>
+			
+       </div>
+   </div>
+</div>

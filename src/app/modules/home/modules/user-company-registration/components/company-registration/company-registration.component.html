@@ -1,0 +1,80 @@
+<div class="container">
+	<div class="row justify-content-center">
+			<strong>{{"company registration"|uppercase}}</strong>
+	</div>
+	<div class="row pt-3">
+		<div class="col-md">
+			<form [formGroup]="companyRegistration" (ngSubmit)="companyRegistrationData()">
+
+				<div class="container">
+					<div class="row">
+						<div class="col-md-3">
+							<i class="fas fa-building pr-2"></i>
+							<label class="required">{{"company name"|uppercase}}</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group input-group">
+								<input type="text"  class="form-control" placeholder="unique company name" formControlName="companyName" (blur)="companyNameValidation($event)" maxlength="25">
+							</div> <!-- form-group// -->
+						</div>
+					</div>
+				</div>
+				<div class="container">
+					<div class="row">
+						<div class="col-md-3">
+							<i class="fa fa-envelope pr-2"></i>
+							<label class="required">{{"email"|uppercase}}</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group input-group">
+								<input type="email"  class="form-control" placeholder="company email" formControlName="email" (blur)="emailValidation($event)" maxlength="25">
+							</div> <!-- form-group// -->
+						</div>
+					</div>
+				</div>
+				<div class="container">
+					<div class="row">
+						<div class="col-md-3"> 
+							<i class="fa fa-phone pr-2"></i>
+							<label class="required">{{"contact"|uppercase}}</label>
+						</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" placeholder="country code" formControlName="countryCode" maxlength="5" >
+						</div>
+						<div class="col-md-4">
+							<input type="number" class="form-control" placeholder="contact number" formControlName="contact" max="9999999999" >
+						</div>
+					</div>
+				</div>
+				<div class="container pt-3">
+					<div class="row">
+						<div class="col-md-3">
+							<i class="fa fa-map-marker-alt pr-2"></i>
+							<label class="required">{{"address"|uppercase}}</label>
+						</div>
+						<div class="col-md-7">
+							<div class="form-group input-group">
+								<input type="text"  class="form-control" placeholder="company address" formControlName="address">
+							</div> <!-- form-group// -->
+						</div>
+					</div>
+				</div>
+
+				<div class="row mb-3">
+					<div class="col-md-3">
+						<button type="submit" class="btn-lg text-white btn-success" [disabled]="!companyRegistration.valid">
+							<i class="fas fa-forward pr-1"></i>
+							{{"submit"|uppercase}}</button>
+					</div>
+					<div class="col-md-3">
+						<button type="button" routerLink="/userCompanyRegistration/menu" class="btn-lg btn-primary">
+						<i class="fas fa-backward pr-1"></i>
+							{{"back"|uppercase}}</button>
+					</div>
+					
+				</div>
+			</form>
+		</div>
+	</div>
+
+</div>

@@ -1,0 +1,19 @@
+
+.sideborder{
+    border: solid white;
+}
+.iconcolor{
+    color: navy;
+}
+
+a:hover{
+    font-weight: bold !important;
+background: #ffffff3b !important;
+text-decoration: none;
+/*border-right: 3px solid #f48024 !important; */
+}
+.active-link{
+	font-weight: bold !important;
+    background: #ffffff3b ;
+    border-right: 3px solid #f48024 !important;
+}

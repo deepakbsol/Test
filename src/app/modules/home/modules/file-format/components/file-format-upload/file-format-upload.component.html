@@ -1,0 +1,217 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 pl-0">
+            <div class="container-fluid shadow-lg mt-2">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>{{"format upload"|uppercase}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <i class="fas fa-info-circle text-primary pr-2"></i><label class="textSize">{{"Configured file
+                            formats : "+fileType+" File size : 1Bto 60MB"}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+                            <div>
+                                <input class="mb-2" type="file" name="file" [accept]="fileType"
+                                    (change)="onFileSelect($event)" />
+                            </div>
+                            <div *ngIf="uploadFileType=='csv'" class="row">
+                                <div class="col-md-5">
+                                    <i class="fas fa-check-circle pr-2"></i>
+                                    <label>{{"delimiter"|uppercase}}</label>
+                                </div>
+                                <div class="col-md-7">
+                                    <select formControlName="delimiter" class="form-control"
+                                        (change)="changedDelimiter()">
+                                        <option value="">{{"delimiter"|uppercase}}</option>
+                                        <option *ngFor="let delimiter of delimiterList" [value]="delimiter">
+                                            {{delimiter}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit" class="mb-4">Upload</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="container-fluid shadow-lg mt-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>{{"configure format"|uppercase}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fa fa-list mr-2 text-primary"></i>
+                        <a routerLink="#">{{"view formt list"|lowercase}}</a>
+                    </div>
+                </div>
+                <div class="mt-3">
+
+                    <form [formGroup]="tableConfig" (ngSubmit)="createFormatData()">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <i class="fa fa-user pr-1"></i>
+                                <label class="required">{{"table name"|uppercase}}</label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group input-group">
+                                    <input type="text" class="form-control" placeholder="tableName"
+                                    oninput="this.value = this.value.toUpperCase()"  formControlName="tableName" (blur)="tableNameValidation($event)" maxlength="25">
+                                </div> <!-- form-group// -->
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <i class="fa fa-user pr-2"></i>
+                                <label>{{"file Decription"|uppercase}}</label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group input-group">
+                                    <input type="text" class="form-control" placeholder="file Decription"
+                                    oninput="this.value = this.value.toUpperCase()" formControlName="fileDecription">
+                                </div> <!-- form-group// -->
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <i class="fa fa-user pr-2"></i>
+                                <label class="required">{{"format Name"|uppercase}}</label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group input-group">
+                                    <input type="text" class="form-control" placeholder="format Name"
+                                     oninput="this.value = this.value.toUpperCase()" formControlName="formatName" (blur)="formatNameValidation($event)"
+                                        maxlength="25">
+                                </div> <!-- form-group// -->
+                            </div>
+                        </div>
+
+                        <div class="row pb-5">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-lg text-white btn-success" [disabled]="!tableConfig.valid || !tableupdate.valid || !isAssignedDataTypeForAll
+                             ">
+                                    <i class="fas fa-forward pr-1"></i>
+                                    {{"submit"|uppercase}}</button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" routerLink="/" class="btn-lg btn-primary">
+                                    <i class="fas fa-backward pr-1"></i>
+                                    {{"back"|uppercase}}</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 shadow-lg pt-1">
+            <label>{{"column details"|uppercase}}</label>
+            <div *ngIf="isFileUploaded">
+                <form [formGroup]="tableupdate">
+                    <table class="table table-dark table-hover table-bordered table-sm table-responsive">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%;">{{"file column"|uppercase}}</th>
+                                <th style="width: 40%;">{{"database column"|uppercase}}</th>
+                                <th style="width: 80%;">{{"datatype "|uppercase}}</th>
+                                <th>{{"length"|uppercase}}</th>
+                                <th>{{"nullable"|uppercase}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of formatDataDtls.mappings">
+                                <td>{{data.col}}</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-md-12" [ngClass]="checkReservedKeyword(data.tabcol)">
+                                            {{data.tabcol}}
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <button class="btn text-white " (click)="open(mymodal,data)">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <select formControlName="datatype" (change)="getselectedDataType(data)"
+                                        class="form-control">
+                                        <option value="">datatype</option>
+                                        <option *ngFor="let datatype of datatypeList" [value]="datatype.name">
+                                            {{datatype.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div *ngIf="data.datatype=='VARCHAR'" class="form-group input-group">
+                                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
+                                        class="form-control"  formControlName="datasize"
+                                            (blur)="dataLength(data)">
+                                    </div>
+                                </td>
+                                <td>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                            (change)="isNullable($event,data)" checked>
+                                        <label class="form-check-label"
+                                            for="flexCheckDefault">{{data.defaultvalue|uppercase}}</label>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- popup page -->
+
+    <ng-template #mymodal let-modal>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">{{"change table column name"|uppercase}}</h4>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <i class="far fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="tableColUpdate">
+                <!-- <input type="text" formControlName="updatedColumn" > -->
+                <div class="row">
+                    <div class="col-md-5">
+                        <i class="fa fa-edit pr-1"></i>
+                        <label class="required ">{{"column name"|uppercase}}</label>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="form-group input-group">
+                            <input type="text" class="form-control" oninput="this.value = this.value.toUpperCase()"
+                                formControlName="updatedColumn" (keyup)="tableColumnNameValidation($event)"
+                                maxlength="25">
+                        </div> <!-- form-group// -->
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancle</button>
+            <button type="button" [disabled]="!this.tableColUpdate.valid || !isValidTableColumn" class="btn btn-success"
+                (click)="changedTableColumn()">submit</button>
+        </div>
+    </ng-template>

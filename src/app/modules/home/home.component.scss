@@ -1,0 +1,23 @@
+.sidebarclass{
+ background-color: skyblue;
+}
+.instruction{
+  // background:#fff;
+  font-weight:500;
+  height: calc(88vh);
+  box-sizing: border-box;
+  overflow-y:scroll;
+  box-shadow: 0 0 9px 0px #949090;
+}
+.sidebar{
+  font-weight:100;
+  height: calc(88vh);
+  box-sizing: border-box;
+  overflow-y:scroll;
+  box-shadow: 0 0 9px 0px #949090;
+}
+.footersize{
+  width: 100%;
+    position: fixed; 
+    bottom: 0;
+}

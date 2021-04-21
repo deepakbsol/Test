@@ -1,0 +1,15 @@
+<div class="container-fluid">
+        <app-header></app-header>
+    <div class="row ">
+        <!-- <div class="col-md-3 sidebar sidebarclass">
+            <app-sidebar></app-sidebar>
+        </div> -->
+        <div class="col-md-12 instruction">
+            <app-homedata *ngIf="router.url=='/'"></app-homedata>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+    <div class="footersize">
+        <app-footer></app-footer>
+    </div>
+</div>

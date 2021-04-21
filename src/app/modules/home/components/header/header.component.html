@@ -1,0 +1,14 @@
+
+<div class="content-fluid headercolor">
+    <div class="row">
+        <div class="col-md-3 pt-2">
+            <strong class="text-white" >{{componentName}}</strong>
+        </div>
+        <div class="col-md-9 list-group list-group-horizontal justify-content-end">
+            <a class="list-group-item headercolor text-white " routerLink="/footer" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"><i class="fas fa-home fontIcons fa-2x"></i></a>
+            <a class="list-group-item headercolor text-white " routerLink="/userCompanyRegistration/menu"><i class="fa fa-user-plus fa-2x"></i></a>
+            <a class="list-group-item headercolor text-white " (click)="logout();"><i class="fa fa-sign-out-alt fa-2x"></i></a>
+            <a class="list-group-item headercolor text-white " routerLink="#"><i class="fas fa-cog fa-2x"></i></a>
+        </div>
+    </div>
+</div>
