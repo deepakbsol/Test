@@ -49,8 +49,9 @@
                         <label>{{"configure format"|uppercase}}</label>
                     </div>
                     <div class="col-md-6">
-                        <i class="fa fa-list mr-2 text-primary"></i>
-                        <a routerLink="#">{{"view formt list"|lowercase}}</a>
+                        <div class="btn text-success " (click)="openFormatView(viewFormatList)">
+                        <i class="fa fa-list mr-2 "></i><label class="viewFormat">{{"view formt list"|lowercase}}</label>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-3">
@@ -64,7 +65,8 @@
                             <div class="col-md-6">
                                 <div class="form-group input-group">
                                     <input type="text" class="form-control" placeholder="tableName"
-                                    oninput="this.value = this.value.toUpperCase()"  formControlName="tableName" (blur)="tableNameValidation($event)" maxlength="25">
+                                        oninput="this.value = this.value.toUpperCase()" formControlName="tableName"
+                                        (blur)="tableNameValidation($event)" maxlength="25">
                                 </div> <!-- form-group// -->
                             </div>
                         </div>
@@ -77,7 +79,8 @@
                             <div class="col-md-6">
                                 <div class="form-group input-group">
                                     <input type="text" class="form-control" placeholder="file Decription"
-                                    oninput="this.value = this.value.toUpperCase()" formControlName="fileDecription">
+                                        oninput="this.value = this.value.toUpperCase()"
+                                        formControlName="fileDecription">
                                 </div> <!-- form-group// -->
                             </div>
                         </div>
@@ -90,35 +93,56 @@
                             <div class="col-md-6">
                                 <div class="form-group input-group">
                                     <input type="text" class="form-control" placeholder="format Name"
-                                     oninput="this.value = this.value.toUpperCase()" formControlName="formatName" (blur)="formatNameValidation($event)"
-                                        maxlength="25">
+                                        oninput="this.value = this.value.toUpperCase()" formControlName="formatName"
+                                        (blur)="formatNameValidation($event)" maxlength="25">
                                 </div> <!-- form-group// -->
                             </div>
                         </div>
 
                         <div class="row pb-5">
-                            <div class="col-md-6">
-                                <button type="submit" class="btn-lg text-white btn-success" [disabled]="!tableConfig.valid || !tableupdate.valid || !isAssignedDataTypeForAll
+                            <div *ngIf="!editFlag && !viewFlage " class="col-md-6">
+                                <button type="submit" class="btn-lg text-white btn-success" [disabled]="!tableConfig.valid || !isAssignedDataTypeForAll
                              ">
                                     <i class="fas fa-forward pr-1"></i>
                                     {{"submit"|uppercase}}</button>
                             </div>
-                            <div class="col-md-6">
+                            <div *ngIf="!editFlag && !viewFlage" class="col-md-6">
                                 <button type="button" routerLink="/" class="btn-lg btn-primary">
                                     <i class="fas fa-backward pr-1"></i>
                                     {{"back"|uppercase}}</button>
                             </div>
-
+                            <div *ngIf="editFlag" class="col-md-6">
+                                <button type="button" (click)="deleteFormat()" class="btn-lg btn-primary">
+                                    <i class="fas fa-backward pr-1"></i>
+                                    {{"delete"|uppercase}}
+                                </button>
+                            </div>
+                            <div *ngIf="editFlag"class="col-md-6">
+                                <button type="button" (click)="updateFormat()" class="btn-lg text-white btn-success">
+                                    <i class="fas fa-forward pr-1"></i>
+                                    {{"update"|uppercase}}</button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
         <div class="col-md-8 shadow-lg pt-1">
-            <label>{{"column details"|uppercase}}</label>
-            <div *ngIf="isFileUploaded">
-                <form [formGroup]="tableupdate">
-                    <table class="table table-dark table-hover table-bordered table-sm table-responsive">
+            <div class="row">
+            <div class="col-md-6">{{"column details"|uppercase}}</div>
+            <div class="col-md-3" *ngIf="viewFlage || editFlag">
+                <button type="button" (click)="download()" class="btn-lg text-white btn-success">
+                    <i class="fas fa-file-download pr-1"></i>
+                    {{"download"|uppercase}}</button>
+            </div>
+            <div class="col-md-3" *ngIf="viewFlage || editFlag">
+                <button type="button" (click)="openFormatView(viewFormatList)"class="btn-lg text-white btn-success">
+                    <i class="fas fa-backward pr-1"></i>
+                    {{"back"|uppercase}}</button>
+            </div>
+            </div>
+            <div class="mt-2" *ngIf="isFileUploaded || viewFlage ||editFlag">
+                    <table class="table table-dark table-hover table-bordered table table-responsive">
                         <thead>
                             <tr>
                                 <th style="width: 35%;">{{"file column"|uppercase}}</th>
@@ -133,12 +157,12 @@
                                 <td>{{data.col}}</td>
                                 <td>
                                     <div class="row">
-                                        <div class="col-md-12" [ngClass]="checkReservedKeyword(data.tabcol)">
+                                        <div  class="col-md-12" [ngClass]="checkReservedKeyword(data.tabcol)">
                                             {{data.tabcol}}
 
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row" *ngIf="!viewFlage">
                                         <div class="col-md-2">
                                             <button class="btn text-white " (click)="open(mymodal,data)">
                                                 <i class="fas fa-pencil-alt"></i>
@@ -148,26 +172,46 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <select formControlName="datatype" (change)="getselectedDataType(data)"
+                                    <!-- <div *ngIf="!viewFlage">
+                                    <select  formControlName="datatype" (change)="getselectedDataType(data)"
                                         class="form-control">
-                                        <option value="">datatype</option>
+                                        <option value="">{{data.datatype|uppercase}}</option>
                                         <option *ngFor="let datatype of datatypeList" [value]="datatype.name">
                                             {{datatype.name}}
                                         </option>
                                     </select>
+                                </div>
+                                    <div *ngIf="viewFlage">{{data.datatype}}</div> -->
+                                <div >
+                                    <select [disabled]="viewFlage" [(ngModel)]="data.datatype" (change)="getselectedDataType(data)"
+                                    class="form-control">
+                                        <option *ngFor="let datatype of datatypeList" [value]="datatype.name">
+                                            {{datatype.name}}
+                                        </option>
+                                    </select>
+                                </div>
                                 </td>
                                 <td>
-                                    <div *ngIf="data.datatype=='VARCHAR'" class="form-group input-group">
-                                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
-                                        class="form-control"  formControlName="datasize"
-                                            (blur)="dataLength(data)">
+                                    <!-- <div *ngIf="!viewFlage">
+                                        <div *ngIf="data.datatype=='VARCHAR'" class="form-group input-group">
+                                            <input type="text"
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                            class="form-control" formControlName="datasize" (blur)="dataLength(data)">
+                                        </div>
+                                    </div>
+                                    <div *ngIf="viewFlage">{{data.datasize}}</div> -->
+                                    
+                                    
+                                    <div  class="form-group input-group">
+                                        <input type="text"[disabled]="data.datatype!='VARCHAR' || viewFlage"  [(ngModel)]="data.datasize"
+                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                        class="form-control" (blur)="dataLength(data)">
                                     </div>
                                 </td>
                                 <td>
-
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                            (change)="isNullable($event,data)" checked>
+                                        <input [disabled]="viewFlage"  [(ngModel)]="data.isSelected" class="form-check-input" type="checkbox"
+                                            (change)="isNullable($event,data)">
                                         <label class="form-check-label"
                                             for="flexCheckDefault">{{data.defaultvalue|uppercase}}</label>
                                     </div>
@@ -176,8 +220,7 @@
                             </tr>
                         </tbody>
                     </table>
-                </form>
-            </div>
+                </div>
         </div>
     </div>
 
@@ -215,3 +258,72 @@
                 (click)="changedTableColumn()">submit</button>
         </div>
     </ng-template>
+
+
+
+
+    <!-- popup page for format list-->
+
+    <ng-template #viewFormatList let-modal >
+        <div>
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">{{"creeated Format List"|uppercase}}</h4>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <i class="far fa-times-circle"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+
+            <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th >{{"FORMAT NAME"|uppercase}}</th>
+                        <th >{{"table name"|uppercase}}</th>
+                        <th >{{"DESCRIPTION "|uppercase}}</th>
+                        <th>{{"no. of col"|uppercase}}</th>
+                        <th>{{"file EXTENSION"|uppercase}}</th>
+                        <th>{{"date of creation"|uppercase}}</th>
+                        <th>{{"CREATED BY"|uppercase}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let format of formatList">
+                        <td>
+                            <div type="button" (click)="viewFormatDtls(format)">
+                                <i *ngIf="!format.flag" class="fa fa-eye text-primary"></i>
+                                <i *ngIf="format.flag" class="fas fa-pen text-primary"></i> {{format.formatname}} 
+                            </div>
+                        </td>
+                        <td>
+                            {{format.tablename}}
+                        </td>
+                        <td>
+                            {{format.tablename}}
+                        </td>
+                        <td>
+                            {{format.colCount}}
+                        </td>
+                        <td>
+                            {{format.fileExt}}
+                        </td>
+                        <td>
+                            {{format.rrrCommonDtls.dateIns}}
+                        </td>
+                        <td>
+                            {{format.rrrCommonDtls.userIns}}
+                        </td>
+                </tbody>
+            </table>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancle</button>
+        </div>
+    </div>
+    </ng-template>
+
+
+
+    

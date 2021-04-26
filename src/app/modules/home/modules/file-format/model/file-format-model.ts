@@ -7,20 +7,21 @@ export class FormatDataDtls {
     }
 } 
 export class MappingsData{
+    siNo:number=0;
     seqId:number=0;
     col:string='';
     tabcol:string='';
-    configId:number=0;
     dateIns:string='';
     datatype:string='';
     datasize:number=0;
     defaultvalue:string='';
-    constructor(seqId:number,col:string,tabcol:string,configId:number,
+    isSelected:boolean=true;
+
+    constructor(seqId:number,col:string,tabcol:string,
         dateIns:string,datatype:string,datasize:number,defaultvalue:string){
             this.seqId=seqId;
             this.col=col;
             this.tabcol=tabcol;
-            this.configId=configId;
             this.dateIns=dateIns;
             this.datatype=datatype;
             this.datasize=datasize;
@@ -34,6 +35,7 @@ export class RrrCommonDtls{
     dateIns:string='';
 }
 export class ConfigData{
+    configId:number=0;
     tablename:string="";
     desc:string="";
     formatname:string="";
@@ -42,21 +44,7 @@ export class ConfigData{
     delimiter:string="";
     headerTag:string='';
     nestedTag:string='';
+    flag:boolean=false;
     rrrCommonDtls:RrrCommonDtls=new RrrCommonDtls();
-    mappings :Array<MappingsData>=new Array<MappingsData>();   
-
-    //  constructor(tablename:string,desc:string,formatname:string,fileext:string,colscount:string,
-    //  formatid:string,delimiter:any,mappings :Array<MappingsData>
-    //  ){
-    //  this.tablename= tablename;
-    //  this.desc=desc;
-    //  this.formatname=formatname;
-    //  this.fileext=fileext;
-    //  this.colscount=colscount;
-    //  this.formatid=formatid;
-    //  this.delimiter=delimiter; 
-    //  this.mappings=mappings;    
-    //  }
-
-
-}
+    mappings :Array<MappingsData>=new Array<MappingsData>();
+    }
