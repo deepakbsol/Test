@@ -8,7 +8,9 @@ const routes: Routes = [
     path: '', component: HomeComponent,
       children: [
         { path: 'userCompanyRegistration', loadChildren: () => import('./modules/user-company-registration/user-company-registration.module').then(m => m.UserCompanyRegistrationModule) },
-        { path: 'file-format', loadChildren: () => import('./modules/file-format/file-format.module').then(m => m.FileFormatModule) }
+        { path: 'file-format', loadChildren: () => import('./modules/file-format/file-format.module').then(m => m.FileFormatModule) },
+        { path: 'formatList-fileUpload', loadChildren: () => import('./modules/format-list-file-upload/format-list-file-upload.module').then(m => m.FormatListFileUploadModule) },
+  
       ]
   },
   
