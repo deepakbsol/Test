@@ -23,7 +23,10 @@ export class FormatListFileUploadService {
     return this.httpClient.get(environment.resource_server+'tableconfig/formatDownload/'+`${configId}`);
   }
 
-  public checkFileUploaded(filename:string,companyId:number):Observable<Boolean>{
-    return this.httpClient.get<Boolean>(environment.resource_server+'fileUpload/checkfileuploaded/'+`${filename}`+`/${companyId}`);
+  public checkFileUploaded(filename:string,companyId:number):Observable<string>{
+    return this.httpClient.get<string>(environment.resource_server+'fileUpload/checkfileuploaded/'+`${filename}`+`/${companyId}`);
+  }
+  public uploadFile(data:any,postUrl:string):Observable<string>{
+    return this.httpClient.post<string>(environment.resource_server+'fileUpload/uploadfile'+postUrl,data);
   }
 }

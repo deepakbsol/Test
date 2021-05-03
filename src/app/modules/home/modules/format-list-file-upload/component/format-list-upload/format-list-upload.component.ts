@@ -145,22 +145,52 @@ export class FormatListUploadComponent implements OnInit {
 				this.postUrl = 'txt';
 		    	break;
     }
-    const formData = new FormData();
-    formData.append('file',this.file);
-    console.log('data-->'+JSON.stringify(this.selectedFormat));
-    this.formatListFileUploadService.checkFileUploaded(this.file.name,this.selectedFormat.rrrCommonDtls.companyId).subscribe(data=>{
+    this.formatListFileUploadService.checkFileUploaded(this.file.name,this.selectedFormat.rrrCommonDtls.companyId).subscribe((data:any)=>{
       console.log(data);
-      this.openFormatView(content);
-
-      
-      })
-    console.log('upload');
+       if(data.responseMessage=='fileAvailable'){
+         this.confirmAlert(content);
+        }else{
+          this.uploadFile();
+        }
+    })
     this.isFileBrowsed=false;
     this.modalService.dismissAll();
     }
     
   }
   
-
+  confirmAlert(content:any) {
+    console.log(content);
+    this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+  userConformed(userChoise:string){
+    console.log(userChoise);
+    this.modalService.dismissAll();
+    if(userChoise=='yes'){
+        this.uploadFile();
+    }
+  }
+  uploadFile(){
+    this.file;
+    const formData = new FormData();
+    formData.append('file',this.file);
+    formData.append('formatname',this.selectedFormat.formatname);
+    this.formatListFileUploadService.uploadFile(formData,this.postUrl).subscribe((data:any)=>{
+      console.log(JSON.stringify(data));
+      this.tostService.success(data.responseMessage);
+    },(error) => {
+      if(error.status==500){
+        this.tostService.error(JSON.stringify(error.error.message));
+      }else{
+        this.tostService.error(JSON.stringify(error.error.responseMessage));
+      }
+      //console.log("error "+JSON.stringify(error.error.message));
+    });
+  }
 }
 

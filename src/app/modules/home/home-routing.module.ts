@@ -13,6 +13,7 @@ const routes: Routes = [
   
       ]
   },
+  { path: 'file-admin', loadChildren: () => import('./modules/file-admin/file-admin.module').then(m => m.FileAdminModule) },
   
 ];
 
