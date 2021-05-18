@@ -6,6 +6,7 @@ import { ConfigData, FormatDataDtls, MappingsData, RrrCommonDtls } from '../../m
 import { FileFormatService } from '../../service&routing/file-format.service';
 import { ToastrService } from 'ngx-toastr';
 import * as fileSaver from 'file-saver';
+import { ActivatedRoute, Router } from '@angular/router';
 export class  MappingsConfig{
   "seqId":number;
   "col":string;
@@ -34,7 +35,7 @@ export class FileFormatUploadComponent implements OnInit {
   delimiterList=[',',';','/','^'];
   formatList:Array<ConfigData>=new Array<ConfigData>();
   constructor(private formBuilder: FormBuilder, private appServiceService:AppServiceService,
-    private fileFormatService:FileFormatService,private modalService: NgbModal,
+    private fileFormatService:FileFormatService,private route: Router, private modalService: NgbModal,
     private tostService:ToastrService) { 
       this.mappingsData=new MappingsData(0,'','','','',0,'');
       this.configDtls=new ConfigData();
@@ -80,14 +81,16 @@ export class FileFormatUploadComponent implements OnInit {
     }
   ]
   ngOnInit(): void {
-    
+    this.appServiceService.moduleChanged='file format';
   }
   uploadFileType='';
   postUrl='';
+  slectedFile='SELECT FILE';
   onFileSelect(event:any) {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
       this.uploadForm.get('file')?.setValue(file);
+      this.slectedFile=file.name;
      this.uploadFileType=file.name.substring(file.name.lastIndexOf('.')+1);
      console.log(this.uploadFileType);
     }
@@ -135,9 +138,9 @@ export class FileFormatUploadComponent implements OnInit {
           this.tableConfig.enable();
         }
 
-      },
-      (err) =>{
+      },(err) =>{
         console.log(err);
+        this.tostService.error(JSON.stringify(err.error.responseMessage));
       } 
     );
   }
@@ -145,7 +148,7 @@ export class FileFormatUploadComponent implements OnInit {
     if(!this.appServiceService.keywords.includes(event.target.value.toUpperCase())){
       this.isValidTableColumn=true; 
     }else{
-      this.tostService.error('Given Column Name is reserved keyword');
+      this.tostService.error('Given Column Name '+event.target.value.toUpperCase()+' is reserved keyword');
       this.isValidTableColumn=false;
     }
   }
@@ -155,7 +158,7 @@ export class FileFormatUploadComponent implements OnInit {
     if(!this.appServiceService.keywords.includes(event.target.value.toUpperCase())){
       this.isValidTabName=true; 
     }else{
-      this.tostService.error('Given Table Name is reserved keyword');
+      this.tostService.error('Given Table Name '+event.target.value.toUpperCase()+' is reserved keyword');
       this.isValidTabName=false;
     }
     console.log('setting table validation name-->'+this.isValidTabName);
@@ -165,7 +168,7 @@ export class FileFormatUploadComponent implements OnInit {
     if(!this.appServiceService.keywords.includes(event.target.value.toUpperCase())){
       this.isValidFormatName=true; 
     }else{
-      this.tostService.error('Given Table Name is reserved keyword');
+      this.tostService.error('Given Table Name '+event.target.value.toUpperCase()+' is reserved keyword');
       this.isValidFormatName=false;
     }
     console.log('setting table validation name-->'+this.isValidFormatName); 
@@ -260,7 +263,7 @@ export class FileFormatUploadComponent implements OnInit {
         if(data.datasize>0 && data.datasize<4000){
           this.formatDataDtls.mappings[length]=data;
         }else{
-           this.tostService.error('Please insert the length between 1 to 4000')
+           this.tostService.error('Please insert the size between 1 to 4000')
         }
       }
     }
@@ -277,7 +280,7 @@ export class FileFormatUploadComponent implements OnInit {
       for(let length=0;length<this.formatDataDtls.mappings.length;length++){
         if(this.formatDataDtls.mappings[length].datatype=='VARCHAR' &&
           (this.formatDataDtls.mappings[length].datasize<=0 ||this.formatDataDtls.mappings[length].datasize>=4000)){
-          this.tostService.error('please give valid length');
+          this.tostService.error('Incorrect datatype size for column '+this.formatDataDtls.mappings[length].col+' , Value range 1 to 4000');
           return false;
         }
         if(this.appServiceService.keywords.includes(this.formatDataDtls.mappings[length].tabcol)){
@@ -476,7 +479,7 @@ export class FileFormatUploadComponent implements OnInit {
         for(let length=0;length<this.configDtls.mappings.length;length++){
           if(this.configDtls.mappings[length].datatype=='VARCHAR' &&
             (this.configDtls.mappings[length].datasize<=0 ||this.configDtls.mappings[length].datasize>=4000)){
-            this.tostService.error('please give valid length');
+            this.tostService.error('Incorrect datatype size for column '+this.formatDataDtls.mappings[length].col+' , Value range 1 to 4000');
             return false;
           }
           if(this.appServiceService.keywords.includes(this.configDtls.mappings[length].tabcol)){
@@ -509,5 +512,8 @@ export class FileFormatUploadComponent implements OnInit {
       });
     }
   }
-
+  fileFormatScreen(){
+    console.log('move')
+    window.location.reload();
+  }
 }

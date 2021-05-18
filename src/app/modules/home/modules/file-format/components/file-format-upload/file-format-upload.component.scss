@@ -6,8 +6,27 @@
     font-size: 10px;
 }
 input.ng-touched.ng-invalid{
-    border: solid red;
+    border: solid rgb(190, 187, 187);
 }
 .viewFormat:hover{
     color: blue;
+}
+.viewFormat{
+    font-size: small;
+}
+.my-custom-scrollbar {
+    position: relative;
+    height: 500px;
+    overflow: auto;
+}
+.my-tab-scrollbar {
+    position: relative;
+    height: 400px;
+    overflow: auto;
+}
+.table-wrapper-scroll-y {
+    display: block;
+}
+.table-responsive {
+    display: table;
 }

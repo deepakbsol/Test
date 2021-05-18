@@ -7,9 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FileAdminComponent implements OnInit {
 
+  
   constructor() { }
 
   ngOnInit(): void {
+   //localStorage.setItem('componentName','file admin')
   }
 
 }

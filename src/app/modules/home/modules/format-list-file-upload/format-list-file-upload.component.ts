@@ -10,6 +10,7 @@ export class FormatListFileUploadComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    localStorage.setItem('componentName','format list & file upload');
   }
 
 }

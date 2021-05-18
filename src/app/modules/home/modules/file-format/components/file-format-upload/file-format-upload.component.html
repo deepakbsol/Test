@@ -14,11 +14,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-8">
                         <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
-                            <div>
+                            <!-- <div>
                                 <input class="mb-2" type="file" name="file" [accept]="fileType"
                                     (change)="onFileSelect($event)" />
+                                    <label class="custom-file-label" for="inputGroupFile01">{{slectedFile}}</label>
+                            </div> -->
+                            <div class="custom-file">
+                                <input type="file" [accept]="fileType" (change)="onFileSelect($event)" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                                <label class="custom-file-label" for="inputGroupFile01">{{slectedFile}}</label>
                             </div>
                             <div *ngIf="uploadFileType=='csv'" class="row">
                                 <div class="col-md-5">
@@ -35,8 +40,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div>
-                                <button type="submit" class="mb-4">Upload</button>
+                            <div class="mt-2 mb-2 float-right">
+                                <!-- <button type="submit" class="mb-4">Upload</button> -->
+                                <button type="submit" class="btn text-white btn-primary" [disabled]="!slectedFile">
+                                    <i class="fas fa-file-upload"></i>
+                                    {{"upload"|uppercase}}
+                                </button>
+                                <!-- <span *ngIf="uploadedFileSize>0" class="pl-5 text-primary">{{"file size:- "+uploadedFileSize+" mb"|uppercase}}</span> -->
                             </div>
                         </form>
                     </div>
@@ -45,12 +55,12 @@
             </div>
             <div class="container-fluid shadow-lg mt-4">
                 <div class="row">
-                    <div class="col-md-6">
-                        <label>{{"configure format"|uppercase}}</label>
+                    <div class="col-md-5">
+                        <label style="font-size: 13.5px;">{{"configure format"|uppercase}}</label>
                     </div>
-                    <div class="col-md-6">
-                        <div class="btn text-success " (click)="openFormatView(viewFormatList)">
-                        <i class="fa fa-list mr-2 "></i><label class="viewFormat">{{"view formt list"|lowercase}}</label>
+                    <div class="col">
+                        <div class="btn text-primary" (click)="openFormatView(viewFormatList)">
+                        <i style="font-size: 10px;" class="fa fa-list ml-3 mr-1 viewFormat"></i><label class="viewFormat">{{"View configured formats"|lowercase}}</label>
                         </div>
                     </div>
                 </div>
@@ -59,12 +69,12 @@
                     <form [formGroup]="tableConfig" (ngSubmit)="createFormatData()">
                         <div class="row">
                             <div class="col-md-6">
-                                <i class="fa fa-user pr-1"></i>
-                                <label class="required">{{"table name"|uppercase}}</label>
+                                <i class="fas fa-border-none pr-1"></i>
+                                <label class="required">{{"Table Name"|uppercase}}</label>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group input-group">
-                                    <input type="text" class="form-control" placeholder="tableName"
+                                    <input type="text" class="form-control" placeholder="Table Name"
                                         oninput="this.value = this.value.toUpperCase()" formControlName="tableName"
                                         (blur)="tableNameValidation($event)" maxlength="25">
                                 </div> <!-- form-group// -->
@@ -73,12 +83,12 @@
 
                         <div class="row">
                             <div class="col-md-6">
-                                <i class="fa fa-user pr-2"></i>
-                                <label>{{"file Decription"|uppercase}}</label>
+                                <i class="fas fa-audio-description pr-1"></i>
+                                <label>{{"File Decription"|uppercase}}</label>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group input-group">
-                                    <input type="text" class="form-control" placeholder="file Decription"
+                                    <input type="text" class="form-control" placeholder="File Decription"
                                         oninput="this.value = this.value.toUpperCase()"
                                         formControlName="fileDecription">
                                 </div> <!-- form-group// -->
@@ -87,12 +97,12 @@
 
                         <div class="row mb-2">
                             <div class="col-md-6">
-                                <i class="fa fa-user pr-2"></i>
-                                <label class="required">{{"format Name"|uppercase}}</label>
+                                <i class="fas fa-text-height pr-1"></i>
+                                <label class="required">{{"Format Name"|uppercase}}</label>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group input-group">
-                                    <input type="text" class="form-control" placeholder="format Name"
+                                    <input type="text" class="form-control" placeholder="Format Name"
                                         oninput="this.value = this.value.toUpperCase()" formControlName="formatName"
                                         (blur)="formatNameValidation($event)" maxlength="25">
                                 </div> <!-- form-group// -->
@@ -101,13 +111,13 @@
 
                         <div class="row pb-5">
                             <div *ngIf="!editFlag && !viewFlage " class="col-md-6">
-                                <button type="submit" class="btn-lg text-white btn-success" [disabled]="!tableConfig.valid || !isAssignedDataTypeForAll
+                                <button type="submit" class="btn text-white btn-primary" [disabled]="!tableConfig.valid || !isAssignedDataTypeForAll
                              ">
                                     <i class="fas fa-forward pr-1"></i>
                                     {{"submit"|uppercase}}</button>
                             </div>
                             <div *ngIf="!editFlag && !viewFlage" class="col-md-6">
-                                <button type="button" routerLink="/" class="btn-lg btn-primary">
+                                <button type="button" routerLink="/" class="btn btn-primary">
                                     <i class="fas fa-backward pr-1"></i>
                                     {{"back"|uppercase}}</button>
                             </div>
@@ -136,20 +146,22 @@
                     {{"download"|uppercase}}</button>
             </div>
             <div class="col-md-3" *ngIf="viewFlage || editFlag">
-                <button type="button" (click)="openFormatView(viewFormatList)"class="btn-lg text-white btn-success">
+                <button type="button" (click)="fileFormatScreen()"class="btn-lg text-white btn-success">
                     <i class="fas fa-backward pr-1"></i>
                     {{"back"|uppercase}}</button>
             </div>
             </div>
             <div class="mt-2" *ngIf="isFileUploaded || viewFlage ||editFlag">
-                    <table class="table table-dark table-hover table-bordered table table-responsive">
+                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                    <div class="col table-responsive">
+                    <table class="table table-bordered table-striped mb-0 table-sm">
                         <thead>
                             <tr>
-                                <th style="width: 35%;">{{"file column"|uppercase}}</th>
-                                <th style="width: 40%;">{{"database column"|uppercase}}</th>
-                                <th style="width: 80%;">{{"datatype "|uppercase}}</th>
-                                <th>{{"length"|uppercase}}</th>
-                                <th>{{"nullable"|uppercase}}</th>
+                                <th>{{"file column"|uppercase}}</th>
+                                <th>{{"database column"|uppercase}}</th>
+                                <th style="width: 20%;">{{"datatype "|uppercase}}</th>
+                                <th style="width: 10%;">{{"size"|uppercase}}</th>
+                                <th style="width: 5%;">{{"nullable"|uppercase}}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,18 +170,19 @@
                                 <td>
                                     <div class="row">
                                         <div  class="col-md-12" [ngClass]="checkReservedKeyword(data.tabcol)">
-                                            {{data.tabcol}}
-
+                                            {{data.tabcol}}<button *ngIf="!viewFlage" class="float-right btn text-primary " (click)="open(mymodal,data)">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="row" *ngIf="!viewFlage">
+                                    <!-- <div class="row" *ngIf="!viewFlage">
                                         <div class="col-md-2">
-                                            <button class="btn text-white " (click)="open(mymodal,data)">
+                                            <button class="btn text-primary " (click)="open(mymodal,data)">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
 
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </td>
                                 <td>
                                     <!-- <div *ngIf="!viewFlage">
@@ -182,7 +195,7 @@
                                     </select>
                                 </div>
                                     <div *ngIf="viewFlage">{{data.datatype}}</div> -->
-                                <div >
+                                <div class="form-group input-group">
                                     <select [disabled]="viewFlage" [(ngModel)]="data.datatype" (change)="getselectedDataType(data)"
                                     class="form-control">
                                         <option *ngFor="let datatype of datatypeList" [value]="datatype.name">
@@ -209,17 +222,19 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="form-check">
+                                    <div class="form-check ml-4">
                                         <input [disabled]="viewFlage"  [(ngModel)]="data.isSelected" class="form-check-input" type="checkbox"
                                             (change)="isNullable($event,data)">
                                         <label class="form-check-label"
                                             for="flexCheckDefault">{{data.defaultvalue|uppercase}}</label>
-                                    </div>
+                                      </div>
 
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    </div>
+                    </div>
                 </div>
         </div>
     </div>
@@ -253,7 +268,7 @@
             </form>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancle</button>
+            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancel</button>
             <button type="button" [disabled]="!this.tableColUpdate.valid || !isValidTableColumn" class="btn btn-success"
                 (click)="changedTableColumn()">submit</button>
         </div>
@@ -264,7 +279,7 @@
 
     <!-- popup page for format list-->
 
-    <ng-template #viewFormatList let-modal >
+    <ng-template #viewFormatList let-modal>
         <div>
         <div class="modal-header">
             <h4 class="modal-title" id="modal-basic-title">{{"creeated Format List"|uppercase}}</h4>
@@ -273,9 +288,9 @@
             </button>
         </div>
         <div class="modal-body">
-
+            <div class="table-wrapper-scroll-y my-tab-scrollbar">
             <div class="table-responsive">
-            <table class="table table-dark table-hover table-bordered table-sm">
+            <table class="table table-hover table-bordered table-sm">
                 <thead>
                     <tr>
                         <th >{{"FORMAT NAME"|uppercase}}</th>
@@ -316,10 +331,10 @@
                 </tbody>
             </table>
             </div>
-
+            </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancle</button>
+            <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancel</button>
         </div>
     </div>
     </ng-template>

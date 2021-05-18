@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AppServiceService } from 'src/app/service&route/app-service.service';
 import { UserAuth } from '../user/model/User';
 
 @Component({
@@ -9,10 +10,9 @@ import { UserAuth } from '../user/model/User';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public router:Router) { }
+  constructor(public router:Router,private appServiceService:AppServiceService) { }
 
   ngOnInit(): void {
-    localStorage.setItem('componentName','home')
   }
 
   public logout():void{

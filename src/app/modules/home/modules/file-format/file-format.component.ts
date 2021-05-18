@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Input, Output, EventEmitter  } from '@angular/core';
+import { AppServiceService } from 'src/app/service&route/app-service.service';
 
 @Component({
   selector: 'app-file-format',
@@ -6,10 +8,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./file-format.component.scss']
 })
 export class FileFormatComponent implements OnInit {
-
-  constructor() { }
-
+  @Output() moduleChanged: EventEmitter<string> =   new EventEmitter();
+ 
+  constructor(private appServiceService:AppServiceService) { }
+  
   ngOnInit(): void {
+   
   }
 
 }
