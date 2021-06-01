@@ -115,10 +115,10 @@ export class UserRegisterComponent implements OnInit {
   }
   public startDateValidation(event:any){
     let startDateError=this.userRegistration.get('startDate')?.hasError('required');
-    let startDate=this.userRegistration.get('startDate')
-    console.log('start--'+typeof(startDate))
+    let startDate=this.userRegistration.get('startDate');
+    console.log('start--'+typeof(startDate));
     if(startDateError){
-      this.tostService.error('start date required')
+      this.tostService.error('start date required');
     }
   }
   public endDateValidation(event:any){

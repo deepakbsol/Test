@@ -21,14 +21,14 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-md-6">
-							<div class="row ml-2">{{"Select core table"|uppercase}}</div>
+							<div class="row ml-5">{{"Select core table"|uppercase}}</div>
 							<div class="container coreTable shadow">
 								<div class="row">
 									<div class="selectBox">
 											<div class="form-check" *ngFor="let item of dataArray">
 												<input class="form-check-input" type="checkbox" [(ngModel)]="item.tableSelected" (change)="getselectedCoreTableId($event,item.id)">
 												<!-- <input class="form-check-input" type="checkbox" name="{{hub.hubId}}" [value]="hub.hubId" (change)="getselectedHubId($event,hub.hubId)" >{{hub.hubName}} -->
-												<label class="form-check-label" for="flexCheckDefault">{{item.tableName|uppercase}}
+												<label class="form-check-label pt-1" for="flexCheckDefault">{{item.tableName|uppercase}}
 												</label>
 											</div>
 									</div> 
@@ -36,7 +36,7 @@
 							</div>
 						</div>
 						<div class="col-md-6">
-							<div class="row ml-2 required">{{"Select modules"|uppercase}}</div>
+							<div class="row ml-5 required">{{"Select modules"|uppercase}}</div>
 							<div class="container coreTable shadow">
 								<div class="row">
 									<div class="selectBox">
@@ -44,7 +44,7 @@
 											
 											<div class="form-check">
 												<input class="form-check-input" type="checkbox" [(ngModel)]="hub.selectedHub" (change)="getselectedHubId($event,hub.id)" >
-												<label class="form-check-label" for="flexCheckDefault">{{hub.name|uppercase}}</label>
+												<label class="form-check-label pt-1" for="flexCheckDefault">{{hub.name|uppercase}}</label>
 									 		 </div>
 	
 											<div *ngFor="let module of moduleData[i].rrrModuleList">

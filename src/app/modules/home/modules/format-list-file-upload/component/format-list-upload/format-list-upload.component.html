@@ -26,12 +26,12 @@
                         <td>{{d.tablename|uppercase}}</td>
                         <td>{{d.desc|uppercase}}</td>
                         <td>{{d.colCount}}</td>
-                        <td>{{d.rrrCommonDtls.dateIns}}</td>
+                        <td>{{d.rrrCommonDtls.dateIns| date: "dd-MM-yyyy hh:mm:ss"}}</td>
                         <td>{{d.rrrCommonDtls.userIns|uppercase}}</td>
                         <td>
-                            <div >
+                            <div>
                                 <button type="button" class="btn btn-primary" (click)="[selectedFormatUpload(d),openFormatUpload(fileUpload)]"><i class="fas fa-file-upload"></i>
-                                    {{"upload "|uppercase}}</button>
+                                {{"upload "|uppercase}}</button>
                             </div>
                         </td>
                     </tr>
@@ -58,7 +58,7 @@
                     <th >{{"file column"|uppercase}}</th>
                     <th >{{"databse column"|uppercase}}</th>
                     <th >{{"data type "|uppercase}}</th>
-                    <th>{{"length"|uppercase}}</th>
+                    <th>{{"size"|uppercase}}</th>
                     <th>{{"nullable"|uppercase}}</th>
                 </tr>
             </thead>
@@ -131,7 +131,7 @@
                                     <i class="fas fa-file-upload"></i>
                                     {{"upload"|uppercase}}
                                 </button>
-                                <span *ngIf="uploadedFileSize>0" class="pl-5 text-primary">{{"file size:- "+uploadedFileSize+" mb"|uppercase}}</span>
+                                <span *ngIf="uploadedFileSize>0" class="pl-5 text-primary">{{"file size:- "|uppercase}}{{uploadedFileSize|number}}{{" mb"|uppercase}}</span>
                             </div>
 
                         </section>

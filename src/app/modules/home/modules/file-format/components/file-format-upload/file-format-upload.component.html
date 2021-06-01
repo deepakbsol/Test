@@ -42,7 +42,7 @@
                             </div>
                             <div class="mt-2 mb-2 float-right">
                                 <!-- <button type="submit" class="mb-4">Upload</button> -->
-                                <button type="submit" class="btn text-white btn-primary" [disabled]="!slectedFile">
+                                <button type="submit" class="btn text-white btn-primary" [disabled]="!isFileSelected">
                                     <i class="fas fa-file-upload"></i>
                                     {{"upload"|uppercase}}
                                 </button>
@@ -56,7 +56,7 @@
             <div class="container-fluid shadow-lg mt-4">
                 <div class="row">
                     <div class="col-md-5">
-                        <label style="font-size: 13.5px;">{{"configure format"|uppercase}}</label>
+                        <label style="font-size: 13.5px;" class="mt-2">{{"configure format"|uppercase}}</label>
                     </div>
                     <div class="col">
                         <div class="btn text-primary" (click)="openFormatView(viewFormatList)">

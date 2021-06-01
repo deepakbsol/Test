@@ -1,90 +1,231 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 ">
-            <form id="msform">
-                <!-- progressbar -->
-                <ul id="progressbar">
-                    <li class="active" id="account"><strong>Account</strong></li>
-                    <li id="personal"><strong>Personal</strong></li>
-                    <li id="payment"><strong>Payment</strong></li>
-                    <li id="confirm"><strong>Finish</strong></li>
-                </ul> <!-- fieldsets -->
-                <fieldset>
-                    <div class="form-card">
-                        <input type="email" name="email" placeholder="Email Id" /> 
-                        <input type="text" name="uname" placeholder="UserName" /> 
-                        <input type="password" name="pwd" placeholder="Password" /> 
-                        <input type="password" name="cpwd" placeholder="Confirm Password" />
-                    </div> 
-                    <input type="button" name="next" class="next action-button" value="Next" (click)="next1()" />
-                    <input type="button" name="prev" class="next action-button" value="PREV" (click)="prev1()" />
-                </fieldset>
-                <fieldset id="stap2">
-                    <div class="form-card">
-                        <h2 class="fs-title">Personal Information</h2> <input type="text" name="fname" placeholder="First Name" /> <input type="text" name="lname" placeholder="Last Name" /> <input type="text" name="phno" placeholder="Contact No." /> <input type="text" name="phno_2" placeholder="Alternate Contact No." />
-                    </div> 
-                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" /> 
-                    <input type="button" name="next" class="next action-button" value="Next Step" />
-                </fieldset>
-                <fieldset>
-                    <div class="form-card">
-                        <h2 class="fs-title">Payment Information</h2>
-                        <div class="radio-group">
-                            <div class='radio' data-value="credit">
-                                <img src="https://i.imgur.com/XzOzVHZ.jpg" width="200px" height="100px"></div>
-                            <div class='radio' data-value="paypal">
-                                <img src="https://i.imgur.com/jXjwZlj.jpg" width="200px" height="100px"></div> <br>
-                        </div> 
-                        <label class="pay">Card Holder Name*</label>
-                        <input type="text" name="holdername" placeholder="" />
-                        <div class="row">
-                            <div class="col-9"> <label class="pay">Card Number*</label> 
-                                <input type="text" name="cardno" placeholder="" /> </div>
-                            <div class="col-3"> <label class="pay">CVC*</label> 
-                                <input type="password" name="cvcpwd" placeholder="***" /> </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3"> <label class="pay">Expiry Date*</label> </div>
-                            <div class="col-9">
-                                 <select class="list-dt" id="month" name="expmonth">
-                                    <option selected>Month</option>
-                                    <option>January</option>
-                                    <option>February</option>
-                                    <option>March</option>
-                                    <option>April</option>
-                                    <option>May</option>
-                                    <option>June</option>
-                                    <option>July</option>
-                                    <option>August</option>
-                                    <option>September</option>
-                                    <option>October</option>
-                                    <option>November</option>
-                                    <option>December</option>
-                                </select>
-                                 <select class="list-dt" id="year" name="expyear">
-                                    <option selected>Year</option>
-                                </select> </div>
-                        </div>
-                    </div> 
-                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" /> 
-                    <input type="button" name="make_payment" class="next action-button" value="Confirm" />
-                </fieldset>
-                <fieldset>
-                    <div class="form-card">
-                        <h2 class="fs-title text-center">Success !</h2> <br><br>
-                        <div class="row justify-content-center">
-                            <div class="col-3"> 
-                                <img src="https://img.icons8.com/color/96/000000/ok--v2.png" class="fit-image"> </div>
-                        </div> <br><br>
-                        <div class="row justify-content-center">
-                            <div class="col-7 text-center">
-                                <h5>You Have Successfully Signed Up</h5>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-        </div>
-    </div>
+<mat-horizontal-stepper [linear]="isLinear" #stepper>
+  <mat-step>
+    <ng-template matStepLabel>data</ng-template>
+    
+	   <div class="row">
 
+        <div class="col-md-3 pl-5"> 
+          <i class="fas fa-signature pr-2"></i>
+          <label class="required">{{"mapping name"|uppercase}}</label>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="text"  class="form-control" placeholder="mapping name" [(ngModel)]="mappingName" (blur)="mappingNameValidation(mappingName)" required>
+          </div> 
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-3 pl-5"> 
+          <i class="fas fa-calendar-day pr-2"></i>
+          <label class="required">{{"validity period"|uppercase}}</label>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="startDate" class="form-control" [(ngModel)]="startDate" (blur)="startDateValidation()">
+          </div> 
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="endDate" class="form-control" [(ngModel)]="endDate" (blur)="endDateValidation()">
+          </div>
+        </div>
+      </div>
+      
+
+         <div class="container pt-2">
+          <div class="row">
+          <div class="col-md-6">
+              <div class="container-fluid shadow"> 
+                <div class="row pb-1 pl-2 pt-2 ">
+                <div class="col-5 required">
+                  {{"Select source table"|uppercase}}</div>
+                <!-- <div class="col-1">
+                  <i class="fas fa-search pl-4 pt-3"></i></div>
+                  <div class="col-5">
+                  <input type="text"  class="form-control" placeholder="search" [(ngModel)]="sourceSearch" (keyup)="sourceTableSearch($event)" required>
+                </div> -->
+                </div>
+                <div class="row coreTable">
+                  <div class="col mt-1 table-responsive">
+                    <table class="table  table-hover table-bordered table">
+                      <thead>
+                          <tr>
+                            <th>{{"TABLE NAME"|uppercase}}</th>
+                            <th>{{"NO. OF COLUMNS"|uppercase}}</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let item of soureceTableList" (change)='sourceTableChange()'>
+                             <td>
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="item.tableSelected">
+                                <label class="form-check-label pt-1" for="flexCheckDefault">{{item.tablename|uppercase}}
+                                </label>
+                              </div>
+                             </td>
+                              <td>{{item.colCount}}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="container-fluid shadow"> 
+              <div class="row pb-1 pl-2 pt-2 ">
+              <div class="col-5 required">
+                {{"Select core table"|uppercase}}</div>
+              <!-- <div class="col-1">
+                <i class="fas fa-search pl-4 pt-3"></i></div>
+                <div class="col-5">
+                <input type="text"  class="form-control" placeholder="search" [(ngModel)]="coreSearch"  required>
+              </div> -->
+              </div>
+              <div class="row coreTable">
+                <div class="col mt-1 table-responsive">
+                  <table class="table  table-hover table-bordered table">
+                    <thead>
+                        <tr>
+                          <th>{{"TABLE NAME"|uppercase}}</th>
+                          <th>{{"NO. OF COLUMNS"|uppercase}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of coreTableList">
+                           <td>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="materialUncheckedDisabled2" name="disabledGroupExample2" (change)="coreTableChanged(item)" mdbInput>
+                                <label class="form-check-label disabled" for="materialUncheckedDisabled2">{{item.tableName|uppercase}}</label>
+                            </div>
+                            </td>
+                            <td>{{item.totalColumn}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    <!-- </form> -->
+    <div class="row">
+      <div class="col">
+        <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" 
+        (click)="stapeOneValidation()" matStepperNext>
+          <i class="fas fa-forward pr-1"></i>
+          {{"next"|uppercase}}
+        </button>
+        <!-- <button type="button" [disabled]="!isValidMappingName || !isValidStartDate || !isValidEndDate || !isSelectedSourceTable || !isSelectedCoreTable" class="btn text-white btn-primary float-right mr-4 mt-3" 
+        (click)="stapeOneValidation()" matStepperNext>
+          <i class="fas fa-forward pr-1"></i>
+          {{"next"|uppercase}}
+        </button> -->
+        <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" routerLink='/'>
+          <i class="fas fa-backward pr-1"></i>
+          {{"back"|uppercase}}
+        </button>
+      </div>
+    </div> 
+  </mat-step>
+  <mat-step>
+     <div class="container-fluid">
+       <div class="row">
+         <div class="col-6">
+           <div>{{"SOURCE TABLE RELATIONS"|uppercase}}</div>
+         </div>
+         <div class="col-4"></div>
+         <div class="col-2 float-right">
+          <mat-slide-toggle [(ngModel)]="switch" (change)="changeTargetType()">{{targetType|uppercase}}</mat-slide-toggle>
+         </div>
+       </div>
+       <div class="row">
+         <div class="col-2">
+          <select class="form-control" [(ngModel)]="tableId1" (change)="changeSelectedSourceTable1()">
+              <option *ngFor="let table of mappingOutput.sourceTable" [value]="table.configId">
+                  {{table.tablename}}
+              </option>
+          </select>
+         </div>
+         <div class="col-2">
+          <select  [(ngModel)]="columnId1" (change)="changeSelectedSourceColumn1()"
+          class="form-control">
+              <option *ngFor="let column of selectedSourceTable1.columns" [value]="column.seqId">
+                  {{column.tabcol|uppercase}}
+              </option>
+          </select>
+         </div>
+         <div class="col-1"></div>
+         <div class="col-2 float-center">
+          <select class="form-control " [(ngModel)]="selectedOperator">
+              <option *ngFor="let operator of relations" [value]="operator.name">
+                  {{operator.name}}
+              </option>
+          </select>
+         </div>
+         <div class="col-1"></div>
+         <div class="col-2">
+          <select class="form-control" [(ngModel)]="tableId2" (change)="changeSelectedSourceTable2()">
+              <option *ngFor="let table of mappingOutput.sourceTable" [value]="table.configId">
+                  {{table.tablename}}
+              </option>
+          </select>
+         </div>
+         <div class="col-2">
+          <select  [(ngModel)]="columnId2" (change)="changeSelectedSourceColumn2()"
+          class="form-control">
+              <option *ngFor="let column of selectedSourceTable2.columns" [value]="column.seqId">
+                  {{column.tabcol|uppercase}}
+              </option>
+          </select>
+         </div>
+         </div>
+      
+      <div class="row">
+        <div class="col-10"></div>
+      <div class="col-2 mt-2">
+        <button type="button" class="btn text-white btn-primary float-right">
+          <i class="fas fa-plus pr-1 pl-3"></i>
+          {{"add"|uppercase}}</button>
+    </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-9"></div>
+      <div class="col-1 form-check ">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+        <label class="form-check-label" for="exampleRadios1">OR</label>
+      </div>
+      <div class="col-1 form-check">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+        <label class="form-check-label" for="exampleRadios2">AND</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10"></div>
+      <div class="col-2 mt-2">
+     <button type="button" class="btn text-white btn-primary float-right">
+       <i class="fas fa-minus pr-1"></i>
+       {{"clear"|uppercase}}</button>
+ </div>
 </div>
+
+     </div>
+
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+    <p>You are now done.</p>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>

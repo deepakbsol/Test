@@ -85,9 +85,11 @@ export class FileFormatUploadComponent implements OnInit {
   }
   uploadFileType='';
   postUrl='';
+  isFileSelected:boolean=false;
   slectedFile='SELECT FILE';
   onFileSelect(event:any) {
     if (event.target.files.length > 0) {
+      this.isFileSelected=true;
       const file = event.target.files[0];
       this.uploadForm.get('file')?.setValue(file);
       this.slectedFile=file.name;
@@ -97,6 +99,7 @@ export class FileFormatUploadComponent implements OnInit {
   }
  //isFileUploaded:boolean=false;
   onSubmit() {
+    this.isFileSelected=false;
     this.viewFlage=false;
     this.editFlag=false;
     this.tableConfig.get('tableName')?.setValue('');

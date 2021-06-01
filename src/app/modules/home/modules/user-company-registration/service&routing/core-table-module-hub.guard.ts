@@ -7,7 +7,6 @@ import {UserCompanyRoleService} from './user-company-role.service'
 })
 export class CoreTableModuleHubGuard implements Resolve<any> {
   constructor(private userCompanyRoleService:UserCompanyRoleService){
-
   }
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.userCompanyRoleService.getCoreTableAndModuleHub();
