@@ -1,9 +1,11 @@
+<div class="container-fluid">
+<div class="row">
+<div class="col">
 <mat-horizontal-stepper [linear]="isLinear" #stepper>
   <mat-step>
     <ng-template matStepLabel>data</ng-template>
-    
-	   <div class="row">
 
+    <div class="row">
         <div class="col-md-3 pl-5"> 
           <i class="fas fa-signature pr-2"></i>
           <label class="required">{{"mapping name"|uppercase}}</label>
@@ -46,9 +48,9 @@
                   <input type="text"  class="form-control" placeholder="search" [(ngModel)]="sourceSearch" (keyup)="sourceTableSearch($event)" required>
                 </div> -->
                 </div>
-                <div class="row coreTable">
-                  <div class="col mt-1 table-responsive">
-                    <table class="table  table-hover table-bordered table">
+                <div class="row">
+                  <div class="col mt-1 tableWrap">
+                    <table>
                       <thead>
                           <tr>
                             <th>{{"TABLE NAME"|uppercase}}</th>
@@ -84,9 +86,9 @@
                 <input type="text"  class="form-control" placeholder="search" [(ngModel)]="coreSearch"  required>
               </div> -->
               </div>
-              <div class="row coreTable">
-                <div class="col mt-1 table-responsive">
-                  <table class="table  table-hover table-bordered table">
+              <div class="row ">
+                <div class="col mt-1 tableWrap">
+                  <table>
                     <thead>
                         <tr>
                           <th>{{"TABLE NAME"|uppercase}}</th>
@@ -142,7 +144,7 @@
           <mat-slide-toggle [(ngModel)]="switch" (change)="changeTargetType()">{{targetType|uppercase}}</mat-slide-toggle>
          </div>
        </div>
-       <div class="row">
+       <div class="row mt-4">
          <div class="col-2">
           <select class="form-control" [(ngModel)]="tableId1" (change)="changeSelectedSourceTable1()">
               <option *ngFor="let table of mappingOutput.sourceTable" [value]="table.configId">
@@ -151,31 +153,36 @@
           </select>
          </div>
          <div class="col-2">
-          <select  [(ngModel)]="columnId1" (change)="changeSelectedSourceColumn1()"
+          <select [disabled]="tableId1==0"  [(ngModel)]="columnId1"
           class="form-control">
               <option *ngFor="let column of selectedSourceTable1.columns" [value]="column.seqId">
                   {{column.tabcol|uppercase}}
               </option>
           </select>
          </div>
-         <div class="col-1"></div>
+         <div class="col-1" ></div>
          <div class="col-2 float-center">
-          <select class="form-control " [(ngModel)]="selectedOperator">
+          <select  class="form-control " [disabled]="tableId1==0 || columnId1==0" [(ngModel)]="selectedOperator">
               <option *ngFor="let operator of relations" [value]="operator.name">
                   {{operator.name}}
               </option>
           </select>
          </div>
          <div class="col-1"></div>
-         <div class="col-2">
+          <div class="col-md-3" *ngIf="switch">
+            <div class="form-group input-group">
+              <input type="text"  class="form-control" placeholder="mapping name" [(ngModel)]="targetValue" required>
+            </div> 
+         </div>
+         <div class="col-2" *ngIf="!switch">
           <select class="form-control" [(ngModel)]="tableId2" (change)="changeSelectedSourceTable2()">
               <option *ngFor="let table of mappingOutput.sourceTable" [value]="table.configId">
                   {{table.tablename}}
               </option>
           </select>
          </div>
-         <div class="col-2">
-          <select  [(ngModel)]="columnId2" (change)="changeSelectedSourceColumn2()"
+         <div class="col-2" *ngIf="!switch">
+          <select [disabled]="tableId2==0" [(ngModel)]="columnId2"
           class="form-control">
               <option *ngFor="let column of selectedSourceTable2.columns" [value]="column.seqId">
                   {{column.tabcol|uppercase}}
@@ -187,45 +194,172 @@
       <div class="row">
         <div class="col-10"></div>
       <div class="col-2 mt-2">
-        <button type="button" class="btn text-white btn-primary float-right">
+        <button [disabled]="tableId1==0 || tableId2==0 || columnId1==0 || columnId2==0" type="button" class="btn text-white btn-primary float-right" 
+        (click)="makeRelation(mappingOutput.relation?connector:'')">
           <i class="fas fa-plus pr-1 pl-3"></i>
           {{"add"|uppercase}}</button>
     </div>
     </div>
     
-    <div class="row">
+    <div class="row" *ngIf="mappingOutput.relation.length>1">
       <div class="col-9"></div>
-      <div class="col-1 form-check ">
-        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-        <label class="form-check-label" for="exampleRadios1">OR</label>
-      </div>
       <div class="col-1 form-check">
-        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+        <input class="form-check-input" type="radio" [(ngModel)]="connector" name="exampleRadios" id="exampleRadios2" value="AND" checked>
         <label class="form-check-label" for="exampleRadios2">AND</label>
       </div>
+      <div class="col-1 form-check ">
+        <input class="form-check-input" type="radio" [(ngModel)]="connector" name="exampleRadios" id="exampleRadios1" value="OR" >
+        <label class="form-check-label" for="exampleRadios1">OR</label>
+      </div>
+      
     </div>
     <div class="row">
       <div class="col-10"></div>
       <div class="col-2 mt-2">
-     <button type="button" class="btn text-white btn-primary float-right">
+     <button [disabled]="tableId1==0 && tableId2==0 && columnId1==0 && columnId2==0" type="button" class="btn text-white btn-primary float-right" (click)="clearSelectedTableAndColumn()">
        <i class="fas fa-minus pr-1"></i>
        {{"clear"|uppercase}}</button>
  </div>
 </div>
-
-     </div>
-
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
+<div class="row">
+  <div class="col mt-2" >
+    <div class="form-group ">
+      <label for="exampleFormControlTextarea1">
+        <span style="font-size: 20px;">{{"Relations Preview"}}</span>
+        &nbsp;<span><i class="fa fa-info-circle text-primary"></i>&nbsp;{{"Use SQL syntax based codes below"}}</span>
+      </label>
+      <div class="col textArea shadow">
+      <textarea class="form-control  mt-2 mb-2" id="exampleFormControlTextarea1" rows="7" [(ngModel)]="mappingOutput.relation"></textarea>
       </div>
+    </div>
+</div>
+</div>
+     </div>
+     <div class="row">
+      <div class="col">
+        <button [disabled]="mappingOutput.relation.length==0" type="button" class="btn text-white btn-primary float-right mr-4 mt-3" 
+        (click)="mappingRelationConfirmation(relationConformation,stepper)">
+          <i class="fas fa-forward pr-1"></i>
+          {{"next"|uppercase}}
+        </button>
+        <!-- <button type="button" [disabled]="!isValidMappingName || !isValidStartDate || !isValidEndDate || !isSelectedSourceTable || !isSelectedCoreTable" class="btn text-white btn-primary float-right mr-4 mt-3" 
+        (click)="stapeOneValidation()" matStepperNext>
+          <i class="fas fa-forward pr-1"></i>
+          {{"next"|uppercase}}
+        </button> -->
+        <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" matStepperPrevious>
+          <i class="fas fa-backward pr-1"></i>
+          {{"previous"|uppercase}}
+        </button>
+      </div>
+    </div> 
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Done</ng-template>
-    <p>You are now done.</p>
+    <ng-template matStepLabel>mapping</ng-template>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-3">
+            <div class="row mappingBgAndText text-white pt-2 pl-5"><i class="fa fa-table pr-1"></i>{{"destination table"|uppercase}}</div>
+            <div class="row">
+            <div class="col destTable">
+              <table>
+                  <thead>
+                      <tr>
+                          <th>{{mappingOutput.coreTable.tableName|uppercase}}</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let col of mappingOutput.coreTable.rrrCoreTableColDtls">
+                          <td style="font-size: 10px;"><span>{{col.columnName|uppercase}}</span><span class="float-right">{{col.dataType == 'VARCHAR2'? 'V' : (col.dataType == 'NUMBER'? 'N' :(col.dataType == 'VARCHAR'? 'V':(col.dataType == 'INT'? 'I':(col.dataType == 'DECIMAL'? 'DE':'D'))))}}<i class=" fas fa-expand-arrows-alt pl-1"></i></span></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+          </div>
+          </div>
+        <div class="col-6">
+          <div class="row mappingBgAndText text-white">
+            <div class="col-7 pt-2">
+              <i class="fas fa-signature pr-1"></i>{{"mapping name : "+mappingOutput.mappingName |uppercase}}
+            </div>
+            <div class="col-5 pt-2 justify-content-right">
+              <mat-slide-toggle [(ngModel)]="isDragMode" (change)="changeModeType()">{{modeType|uppercase}}</mat-slide-toggle>
+            </div>
+
+
+
+            
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="row mappingBgAndText text-white pt-2 pl-5"><i class="fa fa-table pr-1"></i>{{"source table"|uppercase}}</div>
+         
+          <mat-accordion>
+          <div class="row" *ngFor=" let source of mappingOutput.sourceTable">
+             
+            <mat-expansion-panel>
+              <mat-expansion-panel-header class="bg-info text-white">
+                <mat-panel-title>{{source.tablename|uppercase}}</mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="sourceTable">
+                  <table>
+                      <tbody>
+                          <tr *ngFor="let col of source.columns">
+                              <td style="font-size: 12px;"><span>{{col.tabcol|uppercase}}</span>
+                                <span class="float-right pl-1">{{col.datatype == 'VARCHAR2'? 'V' : (col.datatype == 'NUMBER'? 'N' :(col.datatype == 'VARCHAR'? 'V':(col.datatype == 'INT'? 'I':(col.datatype == 'DECIMAL'? 'DE':'D'))))}}<i class=" fas fa-expand-arrows-alt pl-1"></i></span></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+                  </mat-expansion-panel>
+        </div>
+      </mat-accordion>
+
+
+
+
+      </div>
+      </div>
+    </div>
     <div>
       <button mat-button matStepperPrevious>Back</button>
       <button mat-button (click)="stepper.reset()">Reset</button>
     </div>
   </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Done</ng-template>
+  </mat-step>
 </mat-horizontal-stepper>
+</div>
+</div>
+</div>
+
+
+
+
+
+<!-- relation conformation popup -->
+<ng-template #relationConformation let-modal >
+  <div>
+  <div class="modal-header">
+      <h4 class="modal-title text-primary" id="modal-basic-title">{{"Preview source relations"|uppercase}}</h4>       
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+      <h4 class="modal-title text-dark" id="modal-basic-title">{{mappingOutput.relation|uppercase}}</h4>
+      <button type="button" (click)="userConformed('yes')" class="btn-lg text-white btn-success mt-2">
+          <i class="fas fa-check-circle" ></i>
+          {{"yes"|uppercase}}
+      </button>
+      <button type="button" (click)="userConformed('no')" class="btn-lg text-white btn-success mt-2 ml-4">
+          <i class="fas fa-times"></i>
+          {{"no"|uppercase}}
+      </button>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
+  </div>
+</div>
+</ng-template>

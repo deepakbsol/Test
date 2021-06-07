@@ -1,6 +1,9 @@
 export class MappingOutput{
     mappingId:number=0;
     mappingName:string='';
+    startDate:string='';
+    endDate:string='';
+    relation:string='';
     sourceTable:Array<Tables>=new Array<Tables>();
     coreTable:CoreTable=new CoreTable();
 }
@@ -26,7 +29,7 @@ export class CoreTable{
     tableId:number=0;
     tableName:string='';
     totalColumn:number=0;
-    columns:Array<CoreTableColumns>=new Array<CoreTableColumns>();
+    rrrCoreTableColDtls:Array<CoreTableColumns>=new Array<CoreTableColumns>();
 }
 export class CoreTableColumns{
     columnId:number=0;

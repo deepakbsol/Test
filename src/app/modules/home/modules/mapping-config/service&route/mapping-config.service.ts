@@ -17,7 +17,10 @@ export class MappingConfigService {
   public checkMappingName(mappingOutput:MappingOutput):Observable<any>{
     return this.httpClient.get(environment.resource_server+'mapping/validateMappingName/'+`${mappingOutput.mappingId}/`+`${mappingOutput.mappingName}`);
   }
+  public checkRelation(mappingOutput:MappingOutput):Observable<any>{
+    return this.httpClient.post(environment.resource_server+'mapping/sourcerelations',mappingOutput);
+  }
 
-
+  
 
 }

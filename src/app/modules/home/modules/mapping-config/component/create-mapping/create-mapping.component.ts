@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { map } from 'rxjs/operators';
 import { AppServiceService } from 'src/app/service&route/app-service.service';
 import { ColumnsDtls, CoreTable, CoreTableColumns, MappingOutput, Tables } from '../../model/mappingOutput';
 import { MappingConfigService } from '../../service&route/mapping-config.service';
+import {MatStepper} from '@angular/material/stepper';
 
 @Component({
   selector: 'app-create-mapping',
   templateUrl: './create-mapping.component.html',
   styleUrls: ['./create-mapping.component.scss']
 })
+
 export class CreateMappingComponent implements OnInit {
   isLinear = false;
   mappingName:string='';
@@ -19,11 +22,15 @@ export class CreateMappingComponent implements OnInit {
   endDate:string='';
   //firstFormGroup: FormGroup;
   //secondFormGroup: FormGroup;
-
+  //firstFormGroup: FormGroup;
+  //secondFormGroup: FormGroup;
+  
   constructor(private activatedRoute:ActivatedRoute,
     private tostService:ToastrService ,
+    private modalService:NgbModal,
     private appServiceService:AppServiceService,
-    private mappingConfigService:MappingConfigService) {
+    private mappingConfigService:MappingConfigService,
+    ) {
     
     // this.firstFormGroup = this._formBuilder.group({
     //   firstCtrl: ['', Validators.required]
@@ -31,6 +38,9 @@ export class CreateMappingComponent implements OnInit {
     // this.secondFormGroup = this._formBuilder.group({
     //   secondCtrl: ['', Validators.required]
     // });
+
+
+
   }
   coreAndDestTables:any;
   coreTableList:any;
@@ -159,10 +169,12 @@ export class CreateMappingComponent implements OnInit {
       coreTableColumn.dataSize=item.dataSize;
       coreTableColumn.dataType=item.dataType;
       coreTableColumn.nullable=item.nullable;
-      coreTable.columns.push(coreTableColumn);
+      coreTable.rrrCoreTableColDtls.push(coreTableColumn);
     }
     this.mappingOutput.coreTable=coreTable;
     this.mappingOutput.mappingName=this.mappingName;
+    this.mappingOutput.startDate=this.startDate;
+    this.mappingOutput.endDate=this.endDate;
   }
   }
     console.log('data-->'+JSON.stringify(this.mappingOutput));
@@ -192,14 +204,14 @@ export class CreateMappingComponent implements OnInit {
   tableId1:number=0;
   columnId1:number=0;
   selectedSourceColumn1:string='';
-  changeSelectedSourceColumn1(){
-    console.log('column id->'+this.columnId1);
-    for(let col of this.selectedSourceTable1.columns){
-      if(col.seqId==this.columnId1){
-        console.log('column-->'+JSON.stringify(col));
-      }
-    }
-  }
+  // changeSelectedSourceColumn1(){
+  //   console.log('column id->'+this.columnId1);
+  //   for(let col of this.selectedSourceTable1.columns){
+  //     if(col.seqId==this.columnId1){
+  //       console.log('column-->'+JSON.stringify(col));
+  //     }
+  //   }
+  // }
 
   changeSelectedSourceTable1(){
     for(let table of this.mappingOutput.sourceTable){
@@ -212,14 +224,14 @@ export class CreateMappingComponent implements OnInit {
   tableId2:number=0;
   columnId2:number=0;
   selectedSourceTable2:Tables=new Tables();
-  changeSelectedSourceColumn2(){
-    console.log('column id->'+this.columnId1);
-    for(let col of this.selectedSourceTable2.columns){
-      if(col.seqId==this.columnId2){
-        console.log('column-->'+JSON.stringify(col));
-      }
-    }
-  }
+  // changeSelectedSourceColumn2(){
+  //   console.log('column id->'+this.columnId1);
+  //   for(let col of this.selectedSourceTable2.columns){
+  //     if(col.seqId==this.columnId2){
+  //       console.log('column-->'+JSON.stringify(col));
+  //     }
+  //   }
+  // }
 
   changeSelectedSourceTable2(){
     for(let table of this.mappingOutput.sourceTable){
@@ -230,7 +242,6 @@ export class CreateMappingComponent implements OnInit {
   }
 
   relations = [
-
     { id: 0, name: "<" },
     { id: 1, name: ">" },
     { id: 2, name: "=" },
@@ -241,9 +252,135 @@ export class CreateMappingComponent implements OnInit {
     { id: 7, name: "NOT LIKE" },
     { id: 8, name: "EXISTS" },
     { id: 9, name: "NOT EXISTS" }
-
   ];
 
   selectedOperator:string='';
+  targetValue:any;  
+
+  clearSelectedTableAndColumn(){
+    this.selectedSourceTable2=new Tables();
+    this.selectedSourceTable1=new Tables();
+    this.tableId1=0;
+    this.tableId2=0;
+    this.columnId1=0;
+    this.columnId2=0;
+    this.selectedOperator='';
+  }
+  connector:string='';
   
+  makeRelation(connector:string){
+    console.log('connector  '+connector);
+    //first time it will be empty from second time onwards first connector will be added then relation will concat
+    this.mappingOutput.relation=this.mappingOutput.relation+connector+' ';
+    //concat first table name
+    this.mappingOutput.relation=this.mappingOutput.relation+this.selectedSourceTable1.tablename+'.';
+    //concat first selected column name
+    for(let col of this.selectedSourceTable1.columns){
+      if(col.seqId==this.columnId1){
+        this.mappingOutput.relation=this.mappingOutput.relation+col.tabcol+' '
+      }
+    }
+    //adding relation between selected columns
+    this.mappingOutput.relation=this.mappingOutput.relation+this.selectedOperator+' '
+    //concat second table name
+    this.mappingOutput.relation=this.mappingOutput.relation+this.selectedSourceTable2.tablename+'.';
+    //concat first selected column name
+    for(let col of this.selectedSourceTable2.columns){
+      if(col.seqId==this.columnId2){
+        this.mappingOutput.relation=this.mappingOutput.relation+col.tabcol+' '
+      }
+    }
+    console.log('relation--'+this.mappingOutput.relation);
+    this.clearSelectedTableAndColumn();
+    this.connector="AND";
+  }
+  
+  closeResult: string=''; 
+  openFormatView(content:any) {
+    console.log(content);
+    this.modalService.open(content, {size: 'xl',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+  matStapper!: MatStepper;
+  mappingRelationConfirmation(content:any,stapper:MatStepper){
+      this.matStapper=stapper;
+      this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
+      .result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      });
+  }
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
+  }
+  userConformed(userChoise:string){
+    console.log(userChoise);
+    this.modalService.dismissAll();
+    if(userChoise=='yes'){
+      this.stapeTwoValidation();
+    }
+  }
+  stapeTwoValidation(){
+    //clear all the selected tables and columns
+    this.clearSelectedTableAndColumn();
+    //check the made relation between tables
+    this.mappingConfigService.checkRelation(this.mappingOutput).subscribe(data=>{
+      console.log('data-->'+JSON.stringify(data));
+      if(data.result){
+        this.tostService.success('validation passed')
+        this.matStapper.selectedIndex=2;
+      }else{
+        this.tostService.error('Incorrect relation formula')
+      }
+    },(err)=>{
+      this.tostService.error('Incorrect relation formula');
+    });
+  }
+  isDragMode:boolean=true;
+  modeType:string='drag mode';
+  changeModeType(){
+    if(this.isDragMode){
+      this.modeType='drag mode';
+    }else{
+      this.modeType='custome mode';
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
