@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -30,6 +30,8 @@ export class CreateMappingComponent implements OnInit {
     private modalService:NgbModal,
     private appServiceService:AppServiceService,
     private mappingConfigService:MappingConfigService,
+    private cdr: ChangeDetectorRef,
+    private renderer: Renderer2
     ) {
     
     // this.firstFormGroup = this._formBuilder.group({
@@ -47,6 +49,7 @@ export class CreateMappingComponent implements OnInit {
   soureceTableList:any;
   coreSearch:string='';
   sourceSearch:string='';
+  backupCoreAndDestTables:Array<CoreTableColumns>=new Array<CoreTableColumns>();
   ngOnInit() {
     this.coreAndDestTables=this.activatedRoute.snapshot.data;
     this.coreTableList=this.coreAndDestTables.data.coreTable;
@@ -137,6 +140,7 @@ export class CreateMappingComponent implements OnInit {
   }
 
   stapeOneValidation(){
+    this.backupCoreAndDestTables.length=0;
     this.mappingOutput.sourceTable.length=0;
     for(var item of this.soureceTableList){
       if(item.tableSelected){
@@ -171,6 +175,7 @@ export class CreateMappingComponent implements OnInit {
       coreTableColumn.nullable=item.nullable;
       coreTable.rrrCoreTableColDtls.push(coreTableColumn);
     }
+    
     this.mappingOutput.coreTable=coreTable;
     this.mappingOutput.mappingName=this.mappingName;
     this.mappingOutput.startDate=this.startDate;
@@ -187,6 +192,13 @@ export class CreateMappingComponent implements OnInit {
     },(err)=>{
       this.tostService.error('Error occore while checking Mapping Name');
     });
+
+    //taking backup of the selected core table columns
+    this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+    console.log(JSON.stringify(this.backupCoreAndDestTables));
+    console.log("111------------------------------------------------------");
+    console.log("111------------------------------------------------------");
+
   }
  
   switch:boolean=false;
@@ -358,29 +370,102 @@ export class CreateMappingComponent implements OnInit {
   }
 
 
+  // drop(ev:any) {
+  //   console.log('1');
+  //   ev.preventDefault();
+  //   console.log('2');
+  //   console.log(ev.target.value);
+  //   var data = ev.dataTransfer.getData("dropData");
+  //   console.log('3-->'+data);
+  //   ev.target.appendChild(document.getElementById('dropData'));
+  //   console.log('4');
+  // }
 
 
 
+  //mapping started
+  mappingCoreCol:string='';
+  mappingSourceCol:string='';
+  isEnableDragBox:boolean=false;
+  allowDrop(ev:any) {
+    console.log('allowed drop');
+    ev.preventDefault();
+  }
 
+  dragStart(ev:any) {
+    this.isEnableDragBox=true;
+    console.log('start ->'+ev.target.id);
+    //ev.dataTransfer.setData("text", ev.target.id);
+  }
 
+  endCoreTableDrag(coreTable:string,col:CoreTableColumns){
+    this.isEnableDragBox=false;
+    console.log('data-->ended'+coreTable);
+    console.log(JSON.stringify(col));
+    this.mappingCoreCol=col.columnName;
+  }
 
+  endSourceTableDrag(selectedSourceTable:string,col:ColumnsDtls){
+    this.isEnableDragBox=false;
+    console.log('source table-->'+selectedSourceTable);
+    console.log('col-->'+col);
+    this.mappingSourceCol=selectedSourceTable+"."+col.tabcol;
+  }
 
+  mapping:Map<string,string>=new Map<string,string>();
 
+  ViewCreatedMapping(content:any){
+    console.log("data-->"+JSON.stringify(this.mapping));
+    this.modalService.open(content, {size: 'xl',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
 
+  }
+  previewMapping(content:any){
+    this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+  isMappedColumn=false;
+  addMapping(){
+    this.mapping.set(this.mappingCoreCol,this.mappingSourceCol)
+    
+    this.mappingOutput.coreTable.rrrCoreTableColDtls = this.mappingOutput.coreTable.rrrCoreTableColDtls.filter(
+     obj => obj.columnName !== this.mappingCoreCol);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    this.mappingCoreCol='';
+    this.mappingSourceCol='';
+    this.isMappedColumn=true;
+  }
+  clearMapping(){
+    this.mappingCoreCol='';
+    this.mappingSourceCol='';
+  }
+  editSourceColumn(coreColumn:string,sourceColumn:string){
+    this.mappingCoreCol=coreColumn;
+    this.mappingSourceCol=sourceColumn;
+    this.mapping.delete(coreColumn);
+  }    
+  deleteMapping(coreColumn:string){
+    console.log(JSON.stringify(this.backupCoreAndDestTables));
+    console.log('---------------------------------------------------------------------------------');
+    console.log('---------------------------------------------------------------------------------');
+    this.mapping.delete(coreColumn);
+    this.backupCoreAndDestTables.forEach((column: CoreTableColumns) => {
+      if(column.columnName==coreColumn){
+        this.mappingOutput.coreTable.rrrCoreTableColDtls.push(Object.assign({}, column));
+      }
+    });    
+    this.mappingOutput.coreTable.rrrCoreTableColDtls.sort((a,b)=>(a.columnId>b.columnId)?1:-1);
+  }
+  
+  
 
 
 }

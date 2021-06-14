@@ -52,6 +52,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [MappingConfigComponent, CreateMappingComponent],
   imports: [
+	FormsModule,
     CommonModule,
     MappingConfigRoutingModule,
     FormsModule,

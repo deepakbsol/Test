@@ -270,7 +270,13 @@
                   </thead>
                   <tbody>
                       <tr *ngFor="let col of mappingOutput.coreTable.rrrCoreTableColDtls">
-                          <td style="font-size: 10px;"><span>{{col.columnName|uppercase}}</span><span class="float-right">{{col.dataType == 'VARCHAR2'? 'V' : (col.dataType == 'NUMBER'? 'N' :(col.dataType == 'VARCHAR'? 'V':(col.dataType == 'INT'? 'I':(col.dataType == 'DECIMAL'? 'DE':'D'))))}}<i class=" fas fa-expand-arrows-alt pl-1"></i></span></td>
+                        <td style="font-size: 12px;" 
+                        (dragover)="allowDrop($event)"
+                        (dragstart)="dragStart($event)"
+                        (dragend)="endCoreTableDrag(mappingOutput.coreTable.tableName,col)"
+                        draggable="true" >
+                           <span>{{col.columnName|uppercase}}</span><span class="float-right">{{col.dataType == 'VARCHAR2'? 'V' : (col.dataType == 'NUMBER'? 'N' :(col.dataType == 'VARCHAR'? 'V':(col.dataType == 'INT'? 'I':(col.dataType == 'DECIMAL'? 'DE':'D'))))}}<i class=" fas fa-expand-arrows-alt pl-1"></i></span>
+                        </td>
                       </tr>
                   </tbody>
               </table>
@@ -285,11 +291,72 @@
             <div class="col-5 pt-2 justify-content-right">
               <mat-slide-toggle [(ngModel)]="isDragMode" (change)="changeModeType()">{{modeType|uppercase}}</mat-slide-toggle>
             </div>
+            </div>
+          
 
+            <div class="row mt-4">
+              <div class="col-5">
+                <span class="text-muted">{{"Destination Column"}}</span>
+              </div>
+              <div class="col-7">
+                <div class="form-group input-group">
+                    <select class="form-control" [(ngModel)]="mappingCoreCol" aria-placeholder="daata">
+                        <option>{{"select destination column name"}}</option>
+                        <option *ngFor="let d of mappingOutput.coreTable.rrrCoreTableColDtls">
+                            {{d.columnName}}
+                        </option>
+                    </select>
+                </div>
+              </div>
+            </div>
+            <!-- buttons defining -->
+            <div class="row">
+              <div class="col-6">
+                  <button [disabled]="!isMappedColumn"  type="button" class="btn btn-primary" (click)="ViewCreatedMapping(viewMappingContent)">
+                    <i class="fas fa-eye pr-1"></i>
+                    <span class="mappingFontSize">{{"view created mappings"|uppercase}}</span>
+                  </button>
+              </div>
+              <div class="col-3">
+                  <button [disabled]="!mappingCoreCol || !mappingSourceCol" type="button" class="btn btn-primary" (click)="previewMapping(previewMappingContent)">
+                    <i class="fas fa-eye pr-1"></i>
+                    <span class="mappingFontSize">{{"preview"|uppercase}}</span>
+                  </button>
+              </div>
+              <div class="col-3">
+                  <button [disabled]="!mappingCoreCol || !mappingSourceCol" type="button" class="btn btn-primary" (click)="addMapping()">
+                    <i class="fas fa-plus-circle pr-1"></i>
+                    <span class="mappingFontSize">{{"add"|uppercase}}</span>
+                  </button>
+              </div>
+              </div>
+              <div class="row mt-2">
+              <div class="col-3">
+                  <button [disabled]="!mappingCoreCol && !mappingSourceCol" type="button" class="btn btn-primary" (click)="clearMapping()">
+                    <i class="fas fa-trash-alt pr-1"></i>
+                    <span class="mappingFontSize">{{"clear"|uppercase}}</span>
+                  </button>
+              </div>
+              <div class="col-4">
+                <button [disabled]="!mappingCoreCol && !mappingSourceCol" type="button" class="btn btn-primary" (click)="clearMapping()">
+                  <i class="fas fa-calculator-alt pr-1"></i>
+                  <span class="mappingFontSize">{{"operators"|uppercase}}</span>
+                </button>
+              </div>
+              <div class="col-4">
+                <button [disabled]="!mappingCoreCol && !mappingSourceCol" type="button" class="btn btn-primary" (click)="clearMapping()">
+                  <i class="fas fa-trash-alt pr-1"></i>
+                  <span class="mappingFontSize">{{"expressions"|uppercase}}</span>
+                </button>
+              </div>
+            </div>
+              
+            <h3 class="text-muted">{{mappingSourceCol}}</h3>
 
-
+            <div id="dropData" *ngIf="isEnableDragBox" class="example-box" 
+            (dragover)="allowDrop($event)">
+            </div>
             
-          </div>
         </div>
         <div class="col-3">
           <div class="row mappingBgAndText text-white pt-2 pl-5"><i class="fa fa-table pr-1"></i>{{"source table"|uppercase}}</div>
@@ -305,13 +372,18 @@
                   <table>
                       <tbody>
                           <tr *ngFor="let col of source.columns">
-                              <td style="font-size: 12px;"><span>{{col.tabcol|uppercase}}</span>
+                            <td style="font-size: 12px;" 
+                            (dragover)="allowDrop($event)"
+                            (dragstart)="dragStart($event)"
+                            (dragend)="endSourceTableDrag(source.tablename,col)"
+                            draggable="true" >
+                                <span>{{col.tabcol|uppercase}}</span>
                                 <span class="float-right pl-1">{{col.datatype == 'VARCHAR2'? 'V' : (col.datatype == 'NUMBER'? 'N' :(col.datatype == 'VARCHAR'? 'V':(col.datatype == 'INT'? 'I':(col.datatype == 'DECIMAL'? 'DE':'D'))))}}<i class=" fas fa-expand-arrows-alt pl-1"></i></span></td>
                           </tr>
                       </tbody>
                   </table>
                 </div>
-                  </mat-expansion-panel>
+                </mat-expansion-panel>
         </div>
       </mat-accordion>
 
@@ -357,6 +429,73 @@
           <i class="fas fa-times"></i>
           {{"no"|uppercase}}
       </button>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
+  </div>
+</div>
+</ng-template>
+
+
+
+
+<!-- preview mapping popup -->
+<ng-template #previewMappingContent let-modal >
+  <div>
+  <div class="modal-header">
+      <h4 class="modal-title text-primary" id="modal-basic-title">{{"Preview Mapping"|uppercase}}</h4>       
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+      <h1 class="modal-title text-dark" id="modal-basic-title">
+        {{mappingOutput.coreTable.tableName+" : "+mappingCoreCol|uppercase}}</h1>
+        <h4 class="modal-title text-dark pl-3 pr-2" id="modal-basic-title">
+          {{mappingSourceCol|uppercase}}</h4>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
+  </div>
+</div>
+</ng-template>
+
+
+
+<!-- preview mapping popup -->
+<ng-template #viewMappingContent let-modal >
+  <div>
+  <div class="modal-header">
+      <h4 class="modal-title text-primary" id="modal-basic-title">{{"View Mapping Relations"|uppercase}}</h4>       
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+    <div class="viewMappingTable">
+      <table>
+        <thead class="headerColor">
+          <tr>
+            <td>{{"COLUMN NAME"}}</td>
+            <td>{{"MAPPING RULE"}}</td>
+            <td>{{"edit"|uppercase}}</td>
+            <td>{{"delete"|uppercase}}</td>
+          </tr>          
+        </thead>
+        <tbody>
+          <tr *ngFor="let column of mapping | keyvalue">
+            <td>{{column.key}}</td>
+            <td>{{column.value}}</td>
+            <td>
+                <button type="button" class="btn btn-primary" (click)="[editSourceColumn(column.key,column.value),modal.close('Save click')]">{{"edit"|uppercase}}</button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary" (click)="[deleteMapping(column.key),modal.close('Save click')]">{{"delete"|uppercase}}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="modal-footer">
       <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
