@@ -42,7 +42,7 @@
 }
 
 .destTable{
-  height: 350px;
+  height: 400px;
   overflow: auto;
 }
 .viewMappingTable{
@@ -128,24 +128,21 @@ tbody tr:hover {
 }
 
 
-
-
 .example-box {
   width: 200px;
   height: 200px;
-  border: solid 1px #ccc;
+  border: solid 3px #ccc;
   color: rgba(0, 0, 0, 0.87);
   cursor: move;
   display: flex;
   float: center;
-  margin-left: 200px;
-  margin-top: 100px;
   //justify-content: center;
   align-items: center;
   text-align: center;
-  background: #fff;
+  background: rgb(209, 207, 207);
   border-radius: 4px;
   position: relative;
+  margin-left: 200px;
   z-index: 1;
   transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
@@ -166,4 +163,71 @@ tbody tr:hover {
   background-color: rgb(189, 184, 184);
   color: rgb(34, 33, 33);
   font-weight: bold;
+}
+
+
+
+
+
+.dropbtn {  
+  background-color: #4CAF50;    
+color: white;    
+padding: 16px;    
+font-size: 16px;    
+border: none;    
+}    
+  
+.dropdown {    
+position: relative;    
+display: inline-block;    
+}    
+  
+.dropdown-content {    
+display: none;    
+position: absolute;    
+background-color: #f1f1f1;  
+  min-width: 160 px;  
+  box-shadow: 0 px 8 px 16 px 0 px rgba(0, 0, 0, 0.2);  
+  z-index: 1;  
+}.dropdown-content a {  
+      color: black;  
+      padding: 12 px 16 px;  
+      text-decoration: none;  
+      display: block;  
+  }.dropdown-content a:hover {  
+      background-color: #ddd;  
+  }.dropdown:hover.dropdown-content {  
+      display: block;  
+  }.dropdown:hover.dropbtn {  
+      background-color: #3e8e41;}
+
+.destColumnSelect{
+  margin-bottom: 10px;
+  border-bottom: solid gray 3px;
+}
+.bottomBorder{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 250px;
+  border: dotted gray 3px;
+}
+.withoutTop{
+  border-bottom: dotted gray 3px;
+  border-left: dotted gray 3px;
+  border-right: dotted gray 3px;
+}
+
+.mat-select-trigger {
+  min-width: 80vw;
+}
+
+.mat-select-panel {
+  max-height: 80vh !important;
+}
+.multi_lines_text { 
+  white-space: pre-line; 
+}
+
+div.mat-form-field-infix {
+  padding: 0em 0 !important
 }

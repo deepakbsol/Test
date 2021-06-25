@@ -46,10 +46,11 @@ export class UserServiceService {
               .subscribe(
                 usrDtls => {
                   console.log('usrDtls--'+JSON.stringify(usrDtls))
-                 this.userAuth.saveLogedinUser(new User(usrDtls.username,usrDtls.authority,
-                  usrDtls.firstName,
-                  usrDtls.lastName,usrDtls.email,usrDtls.companyId,usrDtls.createdBy ));
-                  // localStorage.setItem('userDtls',JSON.stringify(usrDtls))
+
+                //  this.userAuth.saveLogedinUser(new User(usrDtls.username,usrDtls.authority,
+                //   usrDtls.firstName,
+                //   usrDtls.lastName,usrDtls.email,usrDtls.companyId,usrDtls.createdBy ));
+                   localStorage.setItem('userDtls',JSON.stringify(usrDtls))
                   resolve(true);
                 },
                 err => {

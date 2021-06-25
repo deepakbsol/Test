@@ -1,17 +1,35 @@
+import { RrrCommonDtls } from "../../file-format/model/file-format-model";
+
 export class MappingOutput{
     mappingId:number=0;
     mappingName:string='';
+    destTableId:number=0;
     startDate:string='';
     endDate:string='';
     relation:string='';
+    status:string='';
+    mode:string='';
     sourceTable:Array<Tables>=new Array<Tables>();
     coreTable:CoreTable=new CoreTable();
+    columnMappingDtls:Array<ColumnMappingDtls>=new Array<ColumnMappingDtls>();
+    rrrCommonDtls:RrrCommonDtls=new RrrCommonDtls();
+}
+
+export class ColumnMappingDtls{
+    colMappId:number=0;
+    destColumn:string='';
+    mappRule:string='';
+    destType:string='';
+    conversionRule:string='';
+    isMasterMap:string='';
+    rrrCommonDtls:RrrCommonDtls=new RrrCommonDtls();
 }
 
 export class Tables{
     configId:number=0;
     tablename:string='';
     formatname:string='';
+    rrrCommonDtls:RrrCommonDtls=new RrrCommonDtls();
     columns:Array<ColumnsDtls>=new Array<ColumnsDtls>();
 }
 

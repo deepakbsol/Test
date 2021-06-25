@@ -21,6 +21,12 @@ export class MappingConfigService {
     return this.httpClient.post(environment.resource_server+'mapping/sourcerelations',mappingOutput);
   }
 
-  
+  public addColMapping(mappingOutput:MappingOutput):Observable<any>{
+    return this.httpClient.post(environment.resource_server+'mapping/columnmapping',mappingOutput);
+  }
+
+  public creatingMapping(mappingOutput:MappingOutput):Observable<any>{
+    return this.httpClient.post(environment.resource_server+'mapping/mappingcreate',mappingOutput);
+  }
 
 }

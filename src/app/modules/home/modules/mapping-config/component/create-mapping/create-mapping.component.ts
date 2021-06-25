@@ -1,13 +1,15 @@
 import { ChangeDetectorRef, Component, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { map } from 'rxjs/operators';
 import { AppServiceService } from 'src/app/service&route/app-service.service';
-import { ColumnsDtls, CoreTable, CoreTableColumns, MappingOutput, Tables } from '../../model/mappingOutput';
+import { ColumnMappingDtls, ColumnsDtls, CoreTable, CoreTableColumns, MappingOutput, Tables } from '../../model/mappingOutput';
 import { MappingConfigService } from '../../service&route/mapping-config.service';
 import {MatStepper} from '@angular/material/stepper';
+import { ANY_STATE } from '@angular/animation/src/dsl/animation_transition_expr';
+import { RrrCommonDtls } from '../../../file-format/model/file-format-model';
 
 @Component({
   selector: 'app-create-mapping',
@@ -28,6 +30,7 @@ export class CreateMappingComponent implements OnInit {
   constructor(private activatedRoute:ActivatedRoute,
     private tostService:ToastrService ,
     private modalService:NgbModal,
+    private router:Router,
     private appServiceService:AppServiceService,
     private mappingConfigService:MappingConfigService,
     private cdr: ChangeDetectorRef,
@@ -139,7 +142,7 @@ export class CreateMappingComponent implements OnInit {
     console.log('core-->'+JSON.stringify(item));
   }
 
-  stapeOneValidation(){
+  addSelectedTablesData(){
     this.backupCoreAndDestTables.length=0;
     this.mappingOutput.sourceTable.length=0;
     for(var item of this.soureceTableList){
@@ -174,36 +177,160 @@ export class CreateMappingComponent implements OnInit {
       coreTableColumn.dataType=item.dataType;
       coreTableColumn.nullable=item.nullable;
       coreTable.rrrCoreTableColDtls.push(coreTableColumn);
-    }
-    
+    }    
     this.mappingOutput.coreTable=coreTable;
     this.mappingOutput.mappingName=this.mappingName;
     this.mappingOutput.startDate=this.startDate;
     this.mappingOutput.endDate=this.endDate;
   }
   }
-    console.log('data-->'+JSON.stringify(this.mappingOutput));
-    console.log(this.mappingOutput);
-    this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
-      if(!data.result){
-      }else if(data.result){
-        this.tostService.error('error');
-      }
-    },(err)=>{
-      this.tostService.error('Error occore while checking Mapping Name');
+
+  }
+  stapOnePopUp(content:any){
+    this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
+  }
+  columnMappingDtlsList:Array<ColumnMappingDtls>=new Array<ColumnMappingDtls>();
+  
+  proceed(){
+    //save mapping data in tables
+    
+    //setting the destination table id
+    this.mappingOutput.destTableId=this.mappingOutput.coreTable.tableId;
+    //adding sellected tables 
+    this.addSelectedTablesData();
+    //setting username and companyid
+    this.mappingOutput.mode='save';
+    let x=JSON.parse(localStorage.getItem('userDtls')||'{}');
+    console.log('json data-->'+x);
+    let rrrCommonDtls=new RrrCommonDtls();
+    rrrCommonDtls.companyId=x.rrrCommonDtls.companyId;
+    rrrCommonDtls.userIns=x.rrrCommonDtls.userIns;
+    rrrCommonDtls.dateIns=this.appServiceService.getCurrentDateTime();
+    this.mappingOutput.rrrCommonDtls=rrrCommonDtls;
+    for(let x of this.mappingOutput.sourceTable){
+      x.rrrCommonDtls=rrrCommonDtls;
+    }
+    this.mappingOutput.relation='';
+    this.columnMappingDtlsList.length=0;
 
-    //taking backup of the selected core table columns
-    this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
-    console.log(JSON.stringify(this.backupCoreAndDestTables));
-    console.log("111------------------------------------------------------");
-    console.log("111------------------------------------------------------");
-
+    console.log('mapping data-->'+JSON.stringify(this.mappingOutput));
+   
+   //saving data in data base
+   //calling api
+   this.mappingConfigService.creatingMapping(this.mappingOutput).subscribe(data=>{
+    console.log('proced-->'+JSON.stringify(data));
+    if(data){
+      this.tostService.success(data.message);
+      this.mappingOutput.mappingId=data.mappingId;
+      this.matStapper.selectedIndex=1;
+    }else{
+      this.tostService.error('mapping name already exists');
+    }
+    },(error)=>{
+    this.tostService.error('error while saving mapping');
+    });
+    //check unique mapping name
+    // this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
+    //   if(!data.result){
+    //     this.mappingOutput.relation='';
+    //     this.mapping.clear();
+    //     this.addSelectedTablesData();
+    //     //taking backup of the selected core table columns
+    //     this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+    //     this.matStapper.selectedIndex=1;
+    //   }else if(data.result){
+    //     this.tostService.error('error');
+    //   }
+    // },(err)=>{
+    //   this.tostService.error('Error occore while checking Mapping Name');
+    // });
+    this.modalService.dismissAll();
+  }
+  stapeOneValidation(content:any,stapper:MatStepper){
+    this.matStapper=stapper;
+    this.mappingOutput.mappingName=this.mappingName;
+    //how many source tables are selected 
+    var count=0;
+    for(let item of this.soureceTableList){
+      if(item.tableSelected){
+        count++;
+      }
+    }
+    console.log('selected source table-->'+count);
+    console.log('old -->'+this.mappingOutput.sourceTable.length);
+    if(this.mappingOutput.sourceTable.length==0){
+      this.addSelectedTablesData();
+       //taking backup of the selected core table columns
+       this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+      
+      
+       //check unique mapping name
+       this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
+        console.log('res->'+data.result);
+        console.log('data-->'+JSON.stringify(data));
+        if(!data.result){
+          this.tostService.success('mapping name check-->'+data.result);
+          //taking backup of the selected core table columns
+          this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+          this.matStapper.selectedIndex=1;
+        }else{
+          this.tostService.error('given mapping name already exist');
+        }
+      },(err)=>{
+        this.tostService.error('Error occore while checking Mapping Name');
+      });
+    }else if(count!=this.mappingOutput.sourceTable.length || this.mappingOutput.coreTable.tableId !=this.selectedCoreTable.tableId){
+      //this.tostService.success('show pop up and insert if clicked on proced 111');
+      this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+      this.stapOnePopUp(content);
+    }else{
+      for(var item of this.soureceTableList){
+        if(item.tableSelected){
+           var id=item.configId;
+           this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+            if(!this.mappingOutput.sourceTable.some(source=>source.configId===id)){
+              //this.tostService.success('show pop up and insert if clicked on proced 222');
+              this.stapOnePopUp(content);
+            }else{
+              this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
+                if(!data.result){
+                  this.matStapper.selectedIndex=1;
+                }else{
+                  this.tostService.error('Duplicate mapping name')
+                }
+              },(err)=>{
+                this.tostService.error('error while checking mapping name');
+              });
+            }
+        }
+      }
+       //check unique mapping name
+      //  this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
+      //   if(!data.result){
+      //     //taking backup of the selected core table columns
+      //     this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+      //     this.matStapper.selectedIndex=1;
+      //   }else if(data.result){
+      //     this.tostService.error('mapping name already exists');
+      //   }
+      // },(err)=>{
+      //   this.tostService.error('Error occore while checking Mapping Name');
+      // });
+    }
+    
   }
  
   switch:boolean=false;
   targetType:string='target column';
   changeTargetType(){
+    this.tableId2==0;
+    this.targetValue='';
+    this.columnId2=0;
     if(this.switch){
       this.targetType='target value';
     }else{
@@ -231,6 +358,7 @@ export class CreateMappingComponent implements OnInit {
         this.selectedSourceTable1=table;
       }
     }
+    console.log('source table-->'+JSON.stringify(this.selectedSourceTable1));
   }
 
   tableId2:number=0;
@@ -277,6 +405,7 @@ export class CreateMappingComponent implements OnInit {
     this.columnId1=0;
     this.columnId2=0;
     this.selectedOperator='';
+    this.targetValue='';
   }
   connector:string='';
   
@@ -295,6 +424,8 @@ export class CreateMappingComponent implements OnInit {
     //adding relation between selected columns
     this.mappingOutput.relation=this.mappingOutput.relation+this.selectedOperator+' '
     //concat second table name
+    if(this.selectedSourceTable2.tablename){
+      console.log('second table selected');
     this.mappingOutput.relation=this.mappingOutput.relation+this.selectedSourceTable2.tablename+'.';
     //concat first selected column name
     for(let col of this.selectedSourceTable2.columns){
@@ -302,6 +433,9 @@ export class CreateMappingComponent implements OnInit {
         this.mappingOutput.relation=this.mappingOutput.relation+col.tabcol+' '
       }
     }
+  }else{
+    this.mappingOutput.relation=this.mappingOutput.relation+this.targetValue+' ';
+  }
     console.log('relation--'+this.mappingOutput.relation);
     this.clearSelectedTableAndColumn();
     this.connector="AND";
@@ -382,7 +516,6 @@ export class CreateMappingComponent implements OnInit {
   // }
 
 
-
   //mapping started
   mappingCoreCol:string='';
   mappingSourceCol:string='';
@@ -397,32 +530,35 @@ export class CreateMappingComponent implements OnInit {
     console.log('start ->'+ev.target.id);
     //ev.dataTransfer.setData("text", ev.target.id);
   }
-
+  coreTableColSelected:CoreTableColumns=new CoreTableColumns();
   endCoreTableDrag(coreTable:string,col:CoreTableColumns){
     this.isEnableDragBox=false;
     console.log('data-->ended'+coreTable);
     console.log(JSON.stringify(col));
     this.mappingCoreCol=col.columnName;
+    this.coreTableColSelected=col;
   }
-
+  selectedMappingSourceTable:string=''
+  sourceTableColSelected:ColumnsDtls=new ColumnsDtls();
   endSourceTableDrag(selectedSourceTable:string,col:ColumnsDtls){
     this.isEnableDragBox=false;
     console.log('source table-->'+selectedSourceTable);
     console.log('col-->'+col);
     this.mappingSourceCol=selectedSourceTable+"."+col.tabcol;
+    this.selectedMappingSourceTable=selectedSourceTable;
+    this.sourceTableColSelected=col;
   }
 
   mapping:Map<string,string>=new Map<string,string>();
 
   ViewCreatedMapping(content:any){
-    console.log("data-->"+JSON.stringify(this.mapping));
+    console.log("data-->"+JSON.stringify(this.columnMappingDtlsList));
     this.modalService.open(content, {size: 'xl',animation:true,backdrop:false,scrollable:false})
     .result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
-
   }
   previewMapping(content:any){
     this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
@@ -434,38 +570,130 @@ export class CreateMappingComponent implements OnInit {
   }
   isMappedColumn=false;
   addMapping(){
-    this.mapping.set(this.mappingCoreCol,this.mappingSourceCol)
-    
-    this.mappingOutput.coreTable.rrrCoreTableColDtls = this.mappingOutput.coreTable.rrrCoreTableColDtls.filter(
-     obj => obj.columnName !== this.mappingCoreCol);
+     this.mappingOutput.destTableId=this.mappingOutput.coreTable.tableId;
+     let col=new ColumnMappingDtls();
+     col.destColumn=this.mappingCoreCol;
+     col.destType=this.coreTableColSelected.dataType;
+     col.mappRule=this.selectedMappingSourceTable+"."+this.sourceTableColSelected.tabcol;
+     let x=JSON.parse(localStorage.getItem('userDtls')||'{}');
+     console.log('json data-->'+x);
+     let rrrCommonDtls=new RrrCommonDtls();
+     rrrCommonDtls.companyId=x.rrrCommonDtls.companyId;
+     rrrCommonDtls.userIns=x.rrrCommonDtls.userIns;
+     rrrCommonDtls.dateIns=this.appServiceService.getCurrentDateTime();
+     col.rrrCommonDtls=rrrCommonDtls;
+     this.mappingOutput.columnMappingDtls.push(col);
+     this.mappingConfigService.addColMapping(this.mappingOutput).subscribe(
+      data=>{
+        console.log('data-->>'+data);
+        if(data){
+          this.mapping.set(this.mappingCoreCol,this.mappingSourceCol)
+          this.mappingOutput.coreTable.rrrCoreTableColDtls = this.mappingOutput.coreTable.rrrCoreTableColDtls.filter(
+            obj => obj.columnName !== col.destColumn);
+          this.tostService.success('added mapping column');
+          this.columnMappingDtlsList.push(col);
+          console.log('mapping columns-->'+JSON.stringify(this.columnMappingDtlsList));
+          //this.mapping.set(this.mappingCoreCol,this.sourceTableColSelected.tabcol);
+        }else{
+          this.tostService.error('error while adding column');
+        }
+      },(err)=>{
+        this.tostService.error('error while addmin columan mapping');
+      });
+      console.log('mapping data size-->'+this.mapping.size);
 
-    this.mappingCoreCol='';
-    this.mappingSourceCol='';
-    this.isMappedColumn=true;
+      this.mappingCoreCol='';
+      this.mappingSourceCol='';
+      this.isMappedColumn=true;
+      this.coreTableColSelected=new CoreTableColumns();
+      this.sourceTableColSelected=new ColumnsDtls();
+      this.mappingOutput.columnMappingDtls.pop();
   }
   clearMapping(){
     this.mappingCoreCol='';
     this.mappingSourceCol='';
   }
-  editSourceColumn(coreColumn:string,sourceColumn:string){
-    this.mappingCoreCol=coreColumn;
-    this.mappingSourceCol=sourceColumn;
-    this.mapping.delete(coreColumn);
+  editSourceColumn(col:ColumnMappingDtls){
+    console.log('core column '+col);
+    this.mappingCoreCol=col.destColumn;
+    console.log('mapping core column '+this.mappingCoreCol);
+    this.mappingSourceCol=col.mappRule;
+    this.mapping.delete(col.destColumn);
+    this.columnMappingDtlsList = this.columnMappingDtlsList.filter(
+      obj => obj.destColumn !== col.destColumn);
+     
   }    
-  deleteMapping(coreColumn:string){
+  deleteMapping(col:ColumnMappingDtls){
     console.log(JSON.stringify(this.backupCoreAndDestTables));
     console.log('---------------------------------------------------------------------------------');
     console.log('---------------------------------------------------------------------------------');
-    this.mapping.delete(coreColumn);
+    this.mapping.delete(col.destColumn);
+    this.columnMappingDtlsList = this.columnMappingDtlsList.filter(
+      obj => obj.destColumn !== col.destColumn);
+    
     this.backupCoreAndDestTables.forEach((column: CoreTableColumns) => {
-      if(column.columnName==coreColumn){
+      if(column.columnName==col.destColumn){
         this.mappingOutput.coreTable.rrrCoreTableColDtls.push(Object.assign({}, column));
       }
     });    
     this.mappingOutput.coreTable.rrrCoreTableColDtls.sort((a,b)=>(a.columnId>b.columnId)?1:-1);
   }
   
-  
+  expression(exp:string){
+    console.log('exp-->'+exp);
+  }
+  operators(ope:string){
+    console.log('ope-->'+ope);
+  }
 
+  editPreviewSourceColumn(column:ColumnMappingDtls){
+    
+    this.mappingCoreCol=column.destColumn;
+    this.mappingSourceCol=column.mappRule;
+    //this.mapping.delete(coreColumn);
+    this.columnMappingDtlsList = this.columnMappingDtlsList.filter(
+      obj => obj.destColumn !== column.destColumn);
+    
+    this.matStapper.selectedIndex=2;
+  }
+  submitMappingData(content:any){
+    this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
+    .result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  createMappingConformation(confirm:string){
+    console.log('confirm-->'+confirm);
+    if(confirm==='yes'){
+      //inserting all the mapped column names
+      this.mappingOutput.columnMappingDtls=this.columnMappingDtlsList;
+      this.mappingOutput.mode='create';
+      let x=JSON.parse(localStorage.getItem('userDtls')||'{}');
+      console.log('json data-->'+x);
+      let rrrCommonDtls=new RrrCommonDtls();
+      rrrCommonDtls.companyId=x.rrrCommonDtls.companyId;
+      rrrCommonDtls.userIns=x.rrrCommonDtls.userIns;
+      rrrCommonDtls.dateIns=this.appServiceService.getCurrentDateTime();
+      this.mappingOutput.rrrCommonDtls=rrrCommonDtls;
+      for(let x of this.mappingOutput.sourceTable){
+        x.rrrCommonDtls=rrrCommonDtls;
+      }
+      //calling api
+      console.log(JSON.stringify('create mapping-->'+this.mappingOutput.columnMappingDtls));
+      this.mappingConfigService.creatingMapping(this.mappingOutput).subscribe(data=>{
+        if(data){
+          this.tostService.success(data.message);
+        }
+      },(error)=>{
+        this.tostService.error('error while creating mapping');
+      });
+      //cloasing popup and redirecting to data process tiles
+      this.modalService.dismissAll();
+      this.router.navigate(['/mappingProcess']);   
+    }
+  }  
 
 }
