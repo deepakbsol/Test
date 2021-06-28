@@ -143,7 +143,6 @@ export class CreateMappingComponent implements OnInit {
   }
 
   addSelectedTablesData(){
-    this.backupCoreAndDestTables.length=0;
     this.mappingOutput.sourceTable.length=0;
     for(var item of this.soureceTableList){
       if(item.tableSelected){
@@ -184,7 +183,9 @@ export class CreateMappingComponent implements OnInit {
     this.mappingOutput.endDate=this.endDate;
   }
   }
-
+  this.backupCoreAndDestTables.length=0;
+  this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+    
   }
   stapOnePopUp(content:any){
     this.modalService.open(content, {size: 'md',animation:true,backdrop:false,scrollable:false})
@@ -253,6 +254,7 @@ export class CreateMappingComponent implements OnInit {
   }
   stapeOneValidation(content:any,stapper:MatStepper){
     this.matStapper=stapper;
+    console.log('backup data-->'+JSON.stringify(this.backupCoreAndDestTables));
     this.mappingOutput.mappingName=this.mappingName;
     //how many source tables are selected 
     var count=0;
@@ -266,8 +268,8 @@ export class CreateMappingComponent implements OnInit {
     if(this.mappingOutput.sourceTable.length==0){
       this.addSelectedTablesData();
        //taking backup of the selected core table columns
-       this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
-      
+      //  this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+      //  console.log('1 backup-->'+JSON.stringify(this.backupCoreAndDestTables));
       
        //check unique mapping name
        this.mappingConfigService.checkMappingName(this.mappingOutput).subscribe(data=>{
@@ -276,7 +278,9 @@ export class CreateMappingComponent implements OnInit {
         if(!data.result){
           this.tostService.success('mapping name check-->'+data.result);
           //taking backup of the selected core table columns
-          this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+          //this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+          //console.log('2 backup-->'+JSON.stringify(this.backupCoreAndDestTables));
+          
           this.matStapper.selectedIndex=1;
         }else{
           this.tostService.error('given mapping name already exist');
@@ -286,13 +290,15 @@ export class CreateMappingComponent implements OnInit {
       });
     }else if(count!=this.mappingOutput.sourceTable.length || this.mappingOutput.coreTable.tableId !=this.selectedCoreTable.tableId){
       //this.tostService.success('show pop up and insert if clicked on proced 111');
-      this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+      //this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
       this.stapOnePopUp(content);
     }else{
       for(var item of this.soureceTableList){
         if(item.tableSelected){
            var id=item.configId;
-           this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+          //  this.mappingOutput.coreTable.rrrCoreTableColDtls.forEach((column: CoreTableColumns) => this.backupCoreAndDestTables.push(Object.assign({}, column)));
+          //  console.log('3 backup-->'+JSON.stringify(this.backupCoreAndDestTables));
+      
             if(!this.mappingOutput.sourceTable.some(source=>source.configId===id)){
               //this.tostService.success('show pop up and insert if clicked on proced 222');
               this.stapOnePopUp(content);
@@ -322,7 +328,6 @@ export class CreateMappingComponent implements OnInit {
       //   this.tostService.error('Error occore while checking Mapping Name');
       // });
     }
-    
   }
  
   switch:boolean=false;
@@ -537,14 +542,14 @@ export class CreateMappingComponent implements OnInit {
     console.log(JSON.stringify(col));
     this.mappingCoreCol=col.columnName;
     this.coreTableColSelected=col;
-  }
+  } 
   selectedMappingSourceTable:string=''
   sourceTableColSelected:ColumnsDtls=new ColumnsDtls();
   endSourceTableDrag(selectedSourceTable:string,col:ColumnsDtls){
     this.isEnableDragBox=false;
     console.log('source table-->'+selectedSourceTable);
     console.log('col-->'+col);
-    this.mappingSourceCol=selectedSourceTable+"."+col.tabcol;
+    this.mappingSourceCol=this.mappingSourceCol.concat(selectedSourceTable+"."+col.tabcol);
     this.selectedMappingSourceTable=selectedSourceTable;
     this.sourceTableColSelected=col;
   }
@@ -574,9 +579,10 @@ export class CreateMappingComponent implements OnInit {
      let col=new ColumnMappingDtls();
      col.destColumn=this.mappingCoreCol;
      col.destType=this.coreTableColSelected.dataType;
-     col.mappRule=this.selectedMappingSourceTable+"."+this.sourceTableColSelected.tabcol;
+     col.mappRule=this.mappingSourceCol;
+     //col.mappRule=this.selectedMappingSourceTable+"."+this.sourceTableColSelected.tabcol;
      let x=JSON.parse(localStorage.getItem('userDtls')||'{}');
-     console.log('json data-->'+x);
+     console.log('json data-->'+JSON.stringify(col));
      let rrrCommonDtls=new RrrCommonDtls();
      rrrCommonDtls.companyId=x.rrrCommonDtls.companyId;
      rrrCommonDtls.userIns=x.rrrCommonDtls.userIns;
@@ -640,9 +646,23 @@ export class CreateMappingComponent implements OnInit {
   }
   
   expression(exp:string){
+    if(exp==='case'){
+      this.mappingSourceCol=this.mappingSourceCol.concat('CASE [] WHEN <> THEN <> END');
+    }else if(exp==='braces'){
+      this.mappingSourceCol=this.mappingSourceCol.concat('()');
+    }else if(exp==='concat'){
+      this.mappingSourceCol=this.mappingSourceCol.concat('CONCAT(column 1 , column 2)');
+    }else if(exp==='substring'){
+      this.mappingSourceCol=this.mappingSourceCol.concat('SUBSTRING(column ,int beginIndex, int endIndex)');
+    }else if(exp==='replace'){
+      this.mappingSourceCol=this.mappingSourceCol.concat('REPLACE(column , old character, new character)');
+    }else if(exp==='date'){
+      this.mappingSourceCol=this.mappingSourceCol.concat(this.appServiceService.getCurrentDateTime());
+    }
     console.log('exp-->'+exp);
   }
   operators(ope:string){
+    this.mappingSourceCol=this.mappingSourceCol.concat(ope);
     console.log('ope-->'+ope);
   }
 

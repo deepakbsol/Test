@@ -426,7 +426,7 @@
                 </button>
                 <mat-menu #expressionMenu="matMenu">
                   <button mat-menu-item (click)="expression('case')">{{"case"|uppercase}}</button>
-                  <button mat-menu-item (click)="expression('brace')">{{"brace"|uppercase}}</button>
+                  <button mat-menu-item (click)="expression('braces')">{{"brace"|uppercase}}</button>
                   <button mat-menu-item (click)="expression('concat')">{{"concat"|uppercase}}</button>
                   <button mat-menu-item (click)="expression('substring')">{{"substring"|uppercase}}</button>
                   <button mat-menu-item (click)="expression('date')">{{"date"|uppercase}}</button>
@@ -436,8 +436,11 @@
             </div>
             <div class="bottomBorder">
             <div class="row">
-              <div class="col">
+              <!-- <div class="col">
                 <h3 class="text-muted">{{mappingSourceCol}}</h3>
+              </div> -->
+              <div class="col">
+                <textarea class="form-control inboxHight" id="exampleFormControlTextarea2" [(ngModel)]="mappingSourceCol"></textarea>
               </div>
               </div>
               <div class="row ">
