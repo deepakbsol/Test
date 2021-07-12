@@ -10,6 +10,8 @@ const routes: Routes = [
         { path: 'formatList-fileUpload', loadChildren: () => import('./modules/format-list-file-upload/format-list-file-upload.module').then(m => m.FormatListFileUploadModule) },
         { path: 'file-admin', loadChildren: () => import('./modules/file-admin/file-admin.module').then(m => m.FileAdminModule) },
         { path: 'mapping-config', loadChildren: () => import('./modules/mapping-config/mapping-config.module').then(m => m.MappingConfigModule) },
+        { path: 'dataprocess', loadChildren: () => import('./modules/data-process/data-process.module').then(m => m.DataProcessModule) },
+        
       ]
   },
   

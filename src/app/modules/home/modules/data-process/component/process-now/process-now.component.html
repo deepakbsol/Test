@@ -1,0 +1,229 @@
+<div class="container">
+    <div class="row boldTitle">
+        <div class="col-md-3 pt-3">
+            {{"Data process info"|uppercase}}
+        </div>  
+        
+        <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" routerLink='/dataprocess'>
+            <i class="fas fa-backward pr-1"></i>
+            {{"back"|uppercase}}
+        </button>
+
+        <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" (click)="fileUpload(fileUploadData)">
+          <i class="fas fa-file-upload"></i>
+          {{"file upload"|uppercase}}
+        </button>
+    </div>
+
+    <div class="row pt-3">
+        <div class="col-md-3"> 
+          <i class="fas fa-signature pr-2"></i>
+          <label class="required">{{"mapping name"|uppercase}}</label>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="text"  class="form-control" placeholder="mapping name" [(ngModel)]="mappingOutput.mappingName" disabled="true">
+          </div> 
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-3"> 
+          <i class="fas fa-calendar-day pr-2"></i>
+          <label class="required">{{"validity period"|uppercase}}</label>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="startDate" class="form-control" [(ngModel)]="mappingOutput.startDate" disabled="true">
+          </div> 
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="endDate" class="form-control" [(ngModel)]="mappingOutput.endDate" disabled="true">
+          </div>
+        </div>
+      </div>
+  
+      <div class="row">
+        <div class="col-md-3"> 
+          <i class="fas fa-calendar-day pr-2"></i>
+          <label class="required">{{"file upload Date"|uppercase}}</label>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="startDate" class="form-control" [(ngModel)]="fileUploadStartDate" (blur)="startDateValidation()">
+          </div> 
+        </div>
+        <div class="col-md-3">
+          <div class="form-group input-group">
+            <input type="date" id="endDate" class="form-control" [(ngModel)]="fileUploadEndDate" (blur)="endDateValidation()">
+          </div>
+        </div>
+        <div class="col-md-3">
+            <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" (click)='processaleFile(processableFilePopUp,mappingOutput)'>
+              <i class="fas fa-file-alt"></i>
+              {{"list of file"|uppercase}}
+            </button>    
+        </div>
+      </div>
+      <div class="row pt-3">{{"process output"|uppercase}}</div>
+      <div class="row shadow">
+        <mat-horizontal-stepper [linear]="isLinear" #stepper class="status">
+          <mat-step>
+            <ng-template matStepLabel>status</ng-template>
+            <div class="container">
+              <div class="row">
+                <div class="col"></div>
+              </div>
+            </div>
+          </mat-step>
+          <mat-step>
+            <ng-template matStepLabel>error</ng-template>
+             
+          </mat-step>
+        </mat-horizontal-stepper>
+        
+
+        
+
+      </div>
+</div>
+
+
+
+<ng-template #fileUploadData let-modal >
+  <div class="modal-header">
+      <h2 class="modal-title text-primary" id="modal-basic-title">{{"file upload :- "+mappingOutput.mappingName|uppercase}}</h2>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+    
+    <div class="container">
+      <div class="row">
+              <section class="section-preview">
+                  <div class="col">
+                      <div class="custom-file">
+                          <input type="file" [accept]="fileType" (change)="onFileSelect($event,'browse','')" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                          <label class="custom-file-label" for="inputGroupFile01">{{slectedFile}}</label>
+                      </div>
+                  </div>
+                  <div class="col mt-2 mb-2">
+                      <button type="button" (click)="onFileSelect($event,'upload',fileUploadConformation)" class="btn text-white btn-primary" [disabled]="!isFileBrowsed">
+                          <i class="fas fa-file-upload"></i>
+                          {{"upload"|uppercase}}
+                      </button>
+                      <span *ngIf="uploadedFileSize>0" class="pl-5 text-primary">{{"file size:- "|uppercase}}{{uploadedFileSize|number}}{{" mb"|uppercase}}</span>
+                  </div>
+              </section>
+              
+              <div class="table-responsive">
+                <table class="table  table-hover table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th >{{"format name"|uppercase}}</th>
+                            <th >{{"table name"|uppercase}}</th>
+                            <th >{{"Created by"|uppercase}}</th>
+                            <th>{{"date of creation"|uppercase}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       <tr *ngFor="let data of configData">
+                           <td>{{data.formatname|uppercase}}</td>
+                           <td>{{data.tablename|uppercase}}</td>
+                           <td>{{data.rrrCommonDtls.userIns|uppercase}}</td>
+                           <td>{{data.rrrCommonDtls.dateIns|date:'dd-mm-yyyy hh:mm:ss'}}</td>
+                       </tr>
+                    </tbody>
+                </table>
+                </div>
+          </div>
+      </div>
+
+
+      
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancel</button>
+  </div>
+</ng-template>
+
+
+<ng-template #fileUploadConformation let-modal >
+  <div>
+  <div class="modal-header">
+      <h4 class="modal-title text-primary" id="modal-basic-title">{{"confirmation box"|uppercase}}</h4>       
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+      <h5 class="modal-title text-dark" id="modal-basic-title">{{"This file "+file.name+" already uploaded"|uppercase}}</h5>         
+      <h5 class="modal-title text-dark" id="modal-basic-title">{{"do you want to upload this file again"|uppercase}}</h5>
+      <button type="button" (click)="userConformed('yes')" class="btn-lg text-white btn-success mt-2" >
+          <i class="fas fa-check-circle"></i>
+          {{"yes"|uppercase}}
+      </button>
+      <button type="button" (click)="userConformed('no')" class="btn-lg text-white btn-success mt-2 ml-4">
+          <i class="fas fa-times"></i>
+          {{"no"|uppercase}}
+      </button>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
+  </div>
+</div>
+</ng-template>
+
+<ng-template #processableFilePopUp let-modal >
+  <div>
+  <div class="modal-header">
+      <h2 class="modal-title text-primary" id="modal-basic-title">{{"unprocessed file list :- "+mappingOutput.mappingName|uppercase}}</h2>       
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+      <div class="table-responsive">
+        <table class="table  table-hover table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th >{{"file name"|uppercase}}</th>
+                    <th>{{"upload date"|uppercase}}</th>
+                    <th>{{"donot process"|uppercase}}</th>
+                </tr>
+            </thead>
+            <tbody>
+               <tr *ngFor="let data of processableFileList">
+                   <td>{{data.fileName|uppercase}}</td>
+                   <td>{{data.rrrCommonDtls.dateIns|uppercase}}</td>
+                   <td>
+                    <div class="ml-5">
+                      <label class="switch">
+                          <input type="checkbox" [(ngModel)]="data.isprocessable" (change)="changedDonotProcess($event,data)">
+                          <span class="slider round"></span>
+                      </label>
+                      </div>
+                   </td>
+               </tr>
+            </tbody>
+        </table>
+        </div>
+
+
+
+
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
+  
+      <button type="button" class="btn btn-primary mr-3" (click)="processMapping()">
+      <i class="fas fa-file-alt"></i>
+      process
+      </button>
+  
+  </div>
+  
+</div>
+</ng-template>

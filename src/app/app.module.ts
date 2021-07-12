@@ -25,7 +25,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ToastrModule.forRoot({
       timeOut:5000,
       preventDuplicates:true
-    })
+    }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorInterceptor, multi:true ,},

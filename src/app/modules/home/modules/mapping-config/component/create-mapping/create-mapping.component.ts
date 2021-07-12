@@ -706,13 +706,13 @@ export class CreateMappingComponent implements OnInit {
       this.mappingConfigService.creatingMapping(this.mappingOutput).subscribe(data=>{
         if(data){
           this.tostService.success(data.message);
+          this.router.navigate(['/dataprocess']);   
         }
       },(error)=>{
         this.tostService.error('error while creating mapping');
       });
       //cloasing popup and redirecting to data process tiles
       this.modalService.dismissAll();
-      this.router.navigate(['/mappingProcess']);   
     }
   }  
 

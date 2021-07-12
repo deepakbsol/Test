@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="col-md-2 ">
-    <div class="card tileclass text-white" style="width: 8rem; height:8rem" routerLink='/mappingProcess' >
+    <div class="card tileclass text-white" style="width: 8rem; height:8rem" (click)="mappingProcess(viewMappingName)" >
       <i class="pt-5 fas fa-exchange-alt fa-lg fontIcons"></i>
         <h6 class="textalliend pt-4 card-title textSizeBody">Data Process</h6>
     </div>
@@ -271,3 +271,38 @@
   </div>
   </div>
 </div>
+
+
+
+<ng-template #viewMappingName let-modal >
+  <div class="modal-header">
+      <h4 class="modal-title text-primary" id="modal-basic-title">{{"mapping names"|uppercase}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <i class="far fa-times-circle"></i>
+      </button>
+  </div>
+  <div class="modal-body">
+    <form> 
+    <div class="container coreTable shadow">
+      <div class="row">
+        <div class="col">
+              <div class="selectBox">
+                  <div class="form-check" *ngFor="let item of mappingList">
+                    <input class="form-check-input" type="checkbox" [value]='item.mappingId' (change)="changedSelectedMapping($event)">
+                    <label class="form-check-label pt-2" for="flexCheckDefault">{{item.mappingName}}
+                    </label>
+                  </div>
+              </div> 
+        </div>
+    </div>
+  </div>
+</form>
+</div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancel</button>
+      
+      <button type="button" (click)="submit()" class="btn btn-primary">
+          {{"submit"|uppercase}}
+      </button>
+  </div>
+</ng-template>

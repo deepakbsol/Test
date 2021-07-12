@@ -1,0 +1,90 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col table-responsive">
+            <table class="table  table-hover  table">
+                <thead>
+                    <tr>
+                        <th>{{"process now"|uppercase}}</th>
+                        <th>{{"mapping name"|uppercase}}</th>
+                        <th>{{"download list"|uppercase}}</th>
+                        <th>{{"core table"|uppercase}}</th>
+                        <th>{{"start date"|uppercase}}</th>
+                        <th>{{"end date"|uppercase}}</th>
+                        <th>{{"date of creation"|uppercase}}</th>
+                        <th>{{"other details"|uppercase}}</th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr *ngFor="let d of mappingList">
+                       <td>    
+                            <div >
+                                <button type="button" class="btn btn-success" (click)="processNow(d)"><i class="fas fa-check-circle"></i>
+                                    {{"process now "|uppercase}}</button>
+                            </div>
+                        </td>
+                        <td>{{d.mappingName|uppercase}}</td>
+                        <td>
+                            <div >
+                                <button type="button" class="btn btn-success" ><i class="fas fa-file-excel"></i>
+                                    {{"download"|uppercase}}</button>
+                            </div>
+                        </td>
+                        <td>{{d.mappingName|uppercase}}</td>
+                        <td>{{d.startDate| date: "dd-MM-yyyy"}}</td>
+                        <td>{{d.endDate| date: "dd-MM-yyyy"}}</td>
+                        <td>{{d.rrrCommonDtls.dateIns| date: "dd-MM-yyyy hh:mm:ss"}}</td>
+                        <td>
+                            <div>
+                                <button type="button" (click)="viewMappingOtherDetails(viewOtherMappingDtls,d)" class="btn btn-primary"><i class="fas fa-info-circle"></i>
+                                {{"other details "|uppercase}}</button>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<ng-template #viewOtherMappingDtls let-modal >
+    <div class="modal-header">
+        <h4 class="modal-title text-primary" id="modal-basic-title">{{"mapping details"|uppercase}}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <i class="far fa-times-circle"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="list-group sideborder">
+            <div class="list-group-item   text-dark  "><strong>{{"core table name:-  "+coreTable|uppercase}}</strong></div>
+            <div class="list-group-item   text-dark "><strong>{{"Source tables name"|uppercase}}</strong>
+                <div class="list-group-item   text-dark " *ngFor="let source of selectedMapping.sourceTable"><strong>{{source.tablename|uppercase}}</strong></div>
+            </div>
+            <div class="list-group-item   text-dark  "><strong>{{"relation"|uppercase}}</strong>
+                <div class="list-group-item   text-dark  "><strong>{{selectedMapping.relation|uppercase}}</strong></div>
+            </div>
+            <div class="list-group-item   text-dark "><strong>{{"Column mapping details"|uppercase}}</strong>
+                <table class="table  table-hover table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th >{{"core column"|uppercase}}</th>
+                            <th >{{"source column"|uppercase}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       <tr *ngFor="let source of selectedMapping.columnMappingDtls">
+                           <td>{{source.destColumn|uppercase}}</td>
+                           <td>{{source.conversionRule|uppercase}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">cancel</button>
+    </div>
+</ng-template>
+
+
+
+
