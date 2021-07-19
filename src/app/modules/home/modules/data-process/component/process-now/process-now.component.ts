@@ -1,3 +1,4 @@
+import { ThrowStmt } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -10,6 +11,8 @@ import { ConfigData } from '../../../file-format/model/file-format-model';
 import { FormatListFileUploadService } from '../../../format-list-file-upload/route-service/format-list-file-upload.service';
 import { MappingOutput } from '../../../mapping-config/model/mappingOutput';
 import { DataProcessService } from '../../service&route/data-process.service';
+import * as fileSaver from 'file-saver';
+import { MatStepper } from '@angular/material/stepper';
 
 @Component({
   selector: 'app-process-now',
@@ -264,7 +267,14 @@ export class ProcessNowComponent implements OnInit {
     startDate:'',
     endDate:''
   }
-  processMapping(){
+  isDownloadAvailable=false;
+  isDownloadError=false;
+  result:any;
+  matStapper!: MatStepper;
+  processMapping(matStepper:MatStepper){
+    this.matStapper=matStepper;
+   this.isDownloadAvailable=false;
+    this.isDownloadError=false;
     console.log(this.mappingOutput.mappingId+'-->processableFileList-->'+JSON.stringify(this.processableFileList));
     let flag=false;
     for(let data of this.processableFileList){
@@ -282,16 +292,42 @@ export class ProcessNowComponent implements OnInit {
 
       //call api  executemapping
       this.dataProcessService.processUnprocessedFiles(this.mappingProcess).subscribe(data=>{
-        console.log('data-->'+data);
+        console.log('data-->'+JSON.stringify(data));
+        this.isDownloadAvailable=true;
+        this.isDownloadError=false;
+        this.result=data;
         this.tostService.success('successfully processed mapping');
       },err=>{
-        this.tostService.error('error while processing mapping');
+        this.isDownloadError=true;
+        this.isDownloadAvailable=false;
+        this.matStapper.selectedIndex=1;
+        this.tostService.error(this.result.message);
       });      
       this.mappingProcess.mapDtls=new MappingOutput();
       this.mappingProcess.filesDtls=new Array<UploadedFile>();
       this.mappingProcess.startDate='';
       this.mappingProcess.endDate='';
+
+      this.modalService.dismissAll();
     }
   }
+  downloadResult(){
+    console.log('download-->'+JSON.stringify(this.result));
+      this.dataProcessService.downloadResultData(this.result.processTrigger.triggerId,this.result.processTrigger.destTableId).subscribe(data=>{
+        fileSaver.saveAs(new Blob([this.base64ToArrayBuffer(data.file)], 
+          {type:this.appServiceService.filedownloadType.xlsx}),data.filename+".xlsx");
+      });
+  }
+
+  base64ToArrayBuffer(base64:any) {
+    var binary_string = window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
 
 }

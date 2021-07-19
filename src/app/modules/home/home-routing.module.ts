@@ -11,7 +11,8 @@ const routes: Routes = [
         { path: 'file-admin', loadChildren: () => import('./modules/file-admin/file-admin.module').then(m => m.FileAdminModule) },
         { path: 'mapping-config', loadChildren: () => import('./modules/mapping-config/mapping-config.module').then(m => m.MappingConfigModule) },
         { path: 'dataprocess', loadChildren: () => import('./modules/data-process/data-process.module').then(m => m.DataProcessModule) },
-        
+        { path: 'sales', loadChildren: () => import('./modules/sales-reporting/sales-reporting.module').then(m => m.SalesReportingModule) },
+  
       ]
   },
   

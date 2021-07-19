@@ -60,7 +60,7 @@
           </div>
         </div>
         <div class="col-md-3">
-            <button type="button" class="btn text-white btn-primary float-right mr-4 mt-3" (click)='processaleFile(processableFilePopUp,mappingOutput)'>
+            <button type="button" [disabled]="!fileUploadStartDate || !fileUploadEndDate" class="btn text-white btn-primary float-right mr-4 mt-3" (click)='processaleFile(processableFilePopUp,mappingOutput)'>
               <i class="fas fa-file-alt"></i>
               {{"list of file"|uppercase}}
             </button>    
@@ -72,20 +72,23 @@
           <mat-step>
             <ng-template matStepLabel>status</ng-template>
             <div class="container">
-              <div class="row">
-                <div class="col"></div>
-              </div>
+                <div class="row mb-2" *ngIf="isDownloadAvailable">{{result.message|uppercase}}</div>
+                <div class="row" *ngIf="isDownloadAvailable">
+                  <button type="button" (click)="downloadResult()" class="btn text-white btn-primary">
+                    <i class="fas fa-file-alt"></i>
+                    {{"download resultant data"|uppercase}}
+                  </button>
+                </div>
             </div>
           </mat-step>
           <mat-step>
             <ng-template matStepLabel>error</ng-template>
-             
+            <div class="container">
+              <div class="row mt-4" *ngIf="isDownloadError">{{result.message|uppercase}}</div>
+          </div>
           </mat-step>
         </mat-horizontal-stepper>
         
-
-        
-
       </div>
 </div>
 
@@ -218,7 +221,7 @@
   <div class="modal-footer">
       <button type="button" class="btn btn-primary mr-3" (click)="modal.close('Save click')">cancel</button>
   
-      <button type="button" class="btn btn-primary mr-3" (click)="processMapping()">
+      <button type="button" class="btn btn-primary mr-3" (click)="processMapping(stepper)">
       <i class="fas fa-file-alt"></i>
       process
       </button>
